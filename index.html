@@ -5,23 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>풋살 팀 기록</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 <style>
   :root {
-    --green: #00C27C;
-    --green-dark: #009960;
-    --red: #FF4444;
-    --yellow: #FFB800;
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #222;
-    --border: #2a2a2a;
-    --text: #f0f0f0;
-    --muted: #666;
+    --green: #00C27C; --green-dark: #009960; --red: #FF4444;
+    --yellow: #FFB800; --bg: #0f0f0f; --surface: #1a1a1a;
+    --surface2: #222; --border: #2a2a2a; --text: #f0f0f0; --muted: #666;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
-  header { padding: 2rem 1.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+  header { padding: 2rem 1.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   .team-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 8vw, 3.5rem); letter-spacing: 2px; color: var(--green); line-height: 1; cursor: pointer; }
   .team-subtitle { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .streak-tag { font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 99px; white-space: nowrap; }
@@ -29,45 +21,64 @@
   .streak-lose { background: rgba(255,68,68,0.12); color: var(--red); border: 1px solid rgba(255,68,68,0.25); }
   .streak-draw { background: rgba(255,184,0,0.12); color: var(--yellow); border: 1px solid rgba(255,184,0,0.25); }
   .streak-none { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-  .btn-kakao { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 99px; border: none; background: #FEE500; color: #3A1D1D; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; white-space: nowrap; }
+  .btn-kakao { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 99px; border: none; background: #FEE500; color: #3A1D1D; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
   .btn-kakao:hover { background: #f0d800; }
+
+  /* TEAM PHOTO & LOGO */
+  .team-visual { position: relative; margin: 0; overflow: hidden; }
+  .team-photo-wrap { width: 100%; height: 200px; background: var(--surface); position: relative; overflow: hidden; }
+  .team-photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .team-photo-empty { width: 100%; height: 200px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 13px; cursor: pointer; }
+  .team-photo-empty:hover { background: var(--surface2); }
+  .team-photo-overlay { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px; }
+  .btn-photo-edit { font-size: 12px; padding: 5px 10px; border-radius: 99px; border: none; background: rgba(0,0,0,0.6); color: #fff; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; backdrop-filter: blur(4px); }
+  .logo-wrap { position: absolute; bottom: -24px; left: 1.5rem; width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 3px solid var(--bg); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .logo-empty { font-size: 22px; color: var(--muted); }
+  .logo-tooltip { font-size: 10px; color: var(--muted); position: absolute; bottom: -38px; left: 1.5rem; white-space: nowrap; }
+  .home-top-spacer { height: 36px; }
+  .nav-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 1.5rem; gap: 4px; }
+  .nav-tab { font-size: 14px; font-weight: 500; padding: 12px 16px; border: none; background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .nav-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* STATS */
   .stats-section { padding: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 12px; text-align: center; }
   .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1; }
-  .stat-num.g { color: var(--green); }
-  .stat-num.r { color: var(--red); }
-  .stat-num.y { color: var(--yellow); }
-  .stat-num.w { color: var(--text); }
+  .stat-num.g { color: var(--green); } .stat-num.r { color: var(--red); }
+  .stat-num.y { color: var(--yellow); } .stat-num.w { color: var(--text); }
   .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
   .bar-section { padding: 0 1.5rem 1.5rem; }
   .bar-track { background: var(--surface); border-radius: 99px; height: 8px; overflow: hidden; display: flex; }
   .bar-seg { height: 100%; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
-  .bs-win { background: var(--green); }
-  .bs-draw { background: var(--yellow); }
-  .bs-lose { background: var(--red); }
+  .bs-win { background: var(--green); } .bs-draw { background: var(--yellow); } .bs-lose { background: var(--red); }
   .bar-labels { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
   .bar-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
-  .tabs { display: flex; gap: 6px; padding: 0 1.5rem 1rem; }
-  .tab { font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
-  .tab.active, .tab:hover { color: var(--text); border-color: #444; background: var(--surface2); }
-  .tab.active { color: var(--green); border-color: rgba(0,194,124,0.4); }
-  .match-list { padding: 0 1.5rem; display: flex; flex-direction: column; gap: 8px; padding-bottom: 2rem; }
-  .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: border-color 0.15s; }
-  .match-card:hover { border-color: #333; }
+
+  /* MATCH LIST */
+  .filter-tabs { display: flex; gap: 6px; padding: 0 1.5rem 1rem; }
+  .ftab { font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .ftab.active { color: var(--green); border-color: rgba(0,194,124,0.4); background: var(--surface2); }
+  .match-list { padding: 0 1.5rem; display: flex; flex-direction: column; gap: 8px; padding-bottom: 1rem; }
+  .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.15s; }
+  .match-card:hover { border-color: #444; }
   .match-card.win { border-left: 3px solid var(--green); }
   .match-card.lose { border-left: 3px solid var(--red); }
   .match-card.draw { border-left: 3px solid var(--yellow); }
   .result-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; width: 32px; text-align: center; }
-  .rb-win { color: var(--green); }
-  .rb-lose { color: var(--red); }
-  .rb-draw { color: var(--yellow); }
+  .rb-win { color: var(--green); } .rb-lose { color: var(--red); } .rb-draw { color: var(--yellow); }
   .match-info { flex: 1; min-width: 0; }
-  .match-opp { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .match-opp { font-size: 15px; font-weight: 500; }
   .match-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .match-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 1px; min-width: 60px; text-align: right; }
+  .match-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; min-width: 60px; text-align: right; }
+  .match-scorers { font-size: 12px; color: var(--green); margin-top: 3px; }
   .del-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; transition: opacity 0.15s; }
   .del-btn:hover { opacity: 1; color: var(--red); }
   .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+  /* ADD FORM */
   .add-section { padding: 0 1.5rem 1.5rem; }
   .add-toggle { width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border); background: none; color: var(--muted); font-size: 14px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; margin-bottom: 10px; }
   .add-toggle:hover { border-color: var(--green); color: var(--green); }
@@ -76,24 +87,38 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
-  input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 9px 12px; width: 100%; font-family: 'Noto Sans KR', sans-serif; transition: border-color 0.15s; }
-  input:focus { outline: none; border-color: var(--green); }
+  input, select { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 9px 12px; width: 100%; font-family: 'Noto Sans KR', sans-serif; transition: border-color 0.15s; }
+  input:focus, select:focus { outline: none; border-color: var(--green); }
   input::placeholder { color: var(--muted); }
+  select option { background: var(--surface); }
   .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .score-lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; min-width: 50px; }
+  .score-lbl { font-size: 11px; color: var(--muted); min-width: 50px; text-transform: uppercase; }
   .score-inputs { display: flex; align-items: center; gap: 8px; flex: 1; }
   .score-sep { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--muted); }
   .score-inputs input { width: 70px; text-align: center; }
-  .btn-save { width: 100%; padding: 11px; background: var(--green); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; margin-top: 4px; }
+  .btn-save { width: 100%; padding: 11px; background: var(--green); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-top: 4px; }
   .btn-save:hover { background: var(--green-dark); }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+
+  /* SCORER PICKER */
+  .scorer-section { margin-bottom: 10px; }
+  .scorer-title { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .scorer-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .scorer-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; position: relative; }
+  .scorer-chip.selected { background: rgba(0,194,124,0.15); border-color: var(--green); color: var(--green); }
+  .scorer-chip .goal-count { font-size: 11px; font-weight: 700; margin-left: 4px; }
+  .no-players { font-size: 13px; color: var(--muted); padding: 8px 0; }
+
+  /* MODALS */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 90%; max-width: 340px; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 360px; max-height: 90vh; overflow-y: auto; }
   .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
   .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.2rem; line-height: 1.6; }
   .modal-btns { display: flex; gap: 8px; margin-top: 1rem; }
   .btn-cancel { flex: 1; padding: 10px; border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
   .btn-confirm { flex: 2; padding: 10px; background: var(--green); color: #000; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+  /* SCHEDULE */
   .schedule-section { padding: 0 1.5rem 1.5rem; }
   .schedule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
   .schedule-card.today { border-color: var(--green); }
@@ -106,19 +131,41 @@
   .schedule-info { flex: 1; min-width: 0; }
   .schedule-opp { font-size: 15px; font-weight: 500; }
   .schedule-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
-  .schedule-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; transition: opacity 0.15s; }
+  .schedule-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; }
   .schedule-del:hover { opacity: 1; color: var(--red); }
   .no-schedule { font-size: 13px; color: var(--muted); padding: 10px 0; }
   .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .section-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  .btn-add-schedule { font-size: 12px; padding: 4px 12px; border-radius: 99px; border: 1px dashed var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .btn-add-schedule { font-size: 12px; padding: 4px 12px; border-radius: 99px; border: 1px dashed var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
   .btn-add-schedule:hover { border-color: var(--green); color: var(--green); }
-  .past-section-title { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin: 12px 0 8px; }
-  .btn-enter-result { font-size: 12px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--green); background: none; color: var(--green); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; transition: all 0.15s; }
+  .past-section-title { font-size: 12px; color: var(--muted); text-transform: uppercase; margin: 12px 0 8px; }
+  .btn-enter-result { font-size: 12px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--green); background: none; color: var(--green); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
   .btn-enter-result:hover { background: rgba(0,194,124,0.12); }
-  .loading { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; }
+
+  /* PLAYERS PAGE */
+  .players-section { padding: 1.5rem; }
+  .player-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .player-rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--muted); min-width: 28px; text-align: center; }
+  .player-rank.gold { color: #FFB800; }
+  .player-rank.silver { color: #aaa; }
+  .player-rank.bronze { color: #CD7F32; }
+  .player-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--green); flex-shrink: 0; }
+  .player-info { flex: 1; }
+  .player-name { font-size: 15px; font-weight: 500; }
+  .player-stats { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .player-goals { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--green); }
+  .player-goals-lbl { font-size: 10px; color: var(--muted); text-align: center; }
+  .del-player-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; opacity: 0.4; padding: 4px; }
+  .del-player-btn:hover { opacity: 1; color: var(--red); }
+  .add-player-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; gap: 8px; align-items: center; }
+  .add-player-form input { flex: 1; }
+  .btn-add-player { padding: 9px 16px; background: var(--green); color: #000; font-weight: 700; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
+
+  .participant-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .participant-chip.selected { background: rgba(0,194,124,0.15); border-color: var(--green); color: var(--green); }
+  .participant-chip .check { font-size: 11px; }
   @media (max-width: 400px) {
-    .stats-section { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .stats-section { gap: 6px; }
     .stat-num { font-size: 2rem; }
   }
 </style>
@@ -132,8 +179,8 @@
     <div class="modal-sub">관리자 비밀번호를 입력해주세요.</div>
     <input type="password" id="pwInput" placeholder="비밀번호 입력" style="margin-bottom:0" />
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">취소</button>
-      <button class="btn-confirm" onclick="checkPw()">확인</button>
+      <button class="btn-cancel" id="btnPwCancel">취소</button>
+      <button class="btn-confirm" id="btnPwConfirm">확인</button>
     </div>
   </div>
 </div>
@@ -144,8 +191,8 @@
     <div class="modal-title">팀 이름 변경</div>
     <input type="text" id="nameInput" placeholder="새 팀 이름" style="margin-bottom:0" />
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeNameModal()">취소</button>
-      <button class="btn-confirm" onclick="saveTeamName()">저장</button>
+      <button class="btn-cancel" id="btnNameCancel">취소</button>
+      <button class="btn-confirm" id="btnNameConfirm">저장</button>
     </div>
   </div>
 </div>
@@ -173,8 +220,8 @@
       <input type="text" id="sPlace" placeholder="경기장 이름" />
     </div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeScheduleModal()">취소</button>
-      <button class="btn-confirm" onclick="saveSchedule()">저장</button>
+      <button class="btn-cancel" id="btnSchedCancel">취소</button>
+      <button class="btn-confirm" id="btnSchedConfirm">저장</button>
     </div>
   </div>
 </div>
@@ -192,24 +239,61 @@
         <input type="number" id="rGA" placeholder="실" min="0" max="99" />
       </div>
     </div>
+    <div class="scorer-section">
+      <div class="scorer-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>👥 참여 인원 <span id="resultParticipantCount" style="color:var(--green)"></span></span>
+        <button type="button" id="btnResultSelectAll" style="font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">전체 선택</button>
+      </div>
+      <div class="scorer-list" id="resultParticipantList"></div>
+    </div>
+    <div class="scorer-section">
+      <div class="scorer-title">⚽ 득점자 선택 (선택사항)</div>
+      <div class="scorer-list" id="resultScorerList"></div>
+    </div>
     <div class="form-group" style="margin-bottom:0">
       <span class="form-label">메모 (선택)</span>
       <input type="text" id="rNote" placeholder="특이사항 등" />
     </div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeResultModal()">취소</button>
-      <button class="btn-confirm" onclick="saveResultFromSchedule()">저장</button>
+      <button class="btn-cancel" id="btnResultCancel">취소</button>
+      <button class="btn-confirm" id="btnResultConfirm">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCORERS MODAL (경기 상세) -->
+<div class="modal-overlay" id="scorersModal">
+  <div class="modal">
+    <div class="modal-title" id="scorersModalTitle">경기 상세</div>
+    <div id="scorersModalContent"></div>
+    <div style="display:flex;gap:8px;margin-top:1rem;">
+      <button class="btn-cancel" style="flex:1" id="btnScorersClose">닫기</button>
+      <button class="btn-confirm" style="flex:2;background:var(--green)" id="btnEditScorers">득점자 수정</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SCORERS MODAL -->
+<div class="modal-overlay" id="editScorersModal">
+  <div class="modal">
+    <div class="modal-title">득점자 수정</div>
+    <div class="scorer-section">
+      <div class="scorer-title">팀원을 눌러 골 수를 설정하세요</div>
+      <div class="scorer-list" id="editScorerList"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnEditScorersCancel">취소</button>
+      <button class="btn-confirm" id="btnEditScorersConfirm">저장</button>
     </div>
   </div>
 </div>
 
 <header>
   <div>
-    <div class="team-title" id="teamTitle" onclick="openNameModal()">FC TEAM</div>
-    <div class="team-subtitle">클릭해서 팀 이름 변경</div>
+    <div class="team-title" id="teamTitle">FC TEAM</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-    <button class="btn-kakao" onclick="shareKakao()">
+    <button class="btn-kakao" id="btnKakao">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C4.86 1.5 1.5 4.19 1.5 7.5c0 2.07 1.22 3.89 3.07 5.01L3.75 15l3.13-1.88c.69.13 1.4.2 2.12.2 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z" fill="#3A1D1D"/></svg>
       카톡 공유
     </button>
@@ -217,84 +301,150 @@
   </div>
 </header>
 
-<div class="stats-section">
-  <div class="stat-box"><div class="stat-num w" id="sTotal">0</div><div class="stat-lbl">총 경기</div></div>
-  <div class="stat-box"><div class="stat-num g" id="sWin">0</div><div class="stat-lbl">승</div></div>
-  <div class="stat-box"><div class="stat-num" id="sWinRate" style="color:var(--text)">-</div><div class="stat-lbl">승률</div></div>
-  <div class="stat-box"><div class="stat-num y" id="sDraw">0</div><div class="stat-lbl">무</div></div>
-  <div class="stat-box"><div class="stat-num r" id="sLose">0</div><div class="stat-lbl">패</div></div>
-  <div class="stat-box">
-    <div class="stat-num" style="font-size:1.4rem;display:flex;align-items:center;justify-content:center;gap:4px;padding-top:4px;">
-      <span style="color:var(--green)" id="sGF">0</span>
-      <span style="color:var(--muted);font-size:1rem">:</span>
-      <span style="color:var(--red)" id="sGA">0</span>
-    </div>
-    <div class="stat-lbl">득점:실점</div>
-  </div>
+<!-- NAV -->
+<div class="nav-tabs">
+  <button class="nav-tab active" data-page="home">홈</button>
+  <button class="nav-tab" data-page="matches">경기 기록</button>
+  <button class="nav-tab" data-page="players">선수단</button>
 </div>
 
-<div class="bar-section">
-  <div class="bar-track">
-    <div class="bar-seg bs-win" id="barWin" style="width:0%"></div>
-    <div class="bar-seg bs-draw" id="barDraw" style="width:0%"></div>
-    <div class="bar-seg bs-lose" id="barLose" style="width:0%"></div>
-  </div>
-  <div class="bar-labels">
-    <span><span class="bar-dot" style="background:var(--green)"></span>승</span>
-    <span><span class="bar-dot" style="background:var(--yellow)"></span>무</span>
-    <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
-  </div>
-</div>
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
 
-<div class="schedule-section">
-  <div class="section-header">
-    <span class="section-title">📅 다음 경기</span>
-    <button class="btn-add-schedule" id="btnAddSchedule">+ 일정 추가</button>
-  </div>
-  <div id="scheduleList"><div class="loading">불러오는 중...</div></div>
-</div>
-
-<div class="add-section">
-  <button class="add-toggle" id="btnAddMatch">+ 경기 결과 추가</button>
-  <div class="add-form" id="addForm">
-    <div class="form-row">
-      <div class="form-group">
-        <span class="form-label">상대 팀</span>
-        <input type="text" id="fOpp" placeholder="상대 팀 이름" />
-      </div>
-      <div class="form-group">
-        <span class="form-label">날짜</span>
-        <input type="date" id="fDate" />
+  <!-- 단체사진 + 로고 -->
+  <div class="team-visual">
+    <div id="teamPhotoWrap">
+      <div class="team-photo-empty" id="teamPhotoEmpty">
+        <span style="font-size:28px">📸</span>
+        <span>단체 사진을 추가해보세요</span>
+        <span style="font-size:11px;color:var(--border)">(관리자만 변경 가능)</span>
       </div>
     </div>
-    <div class="score-row">
-      <span class="score-lbl">스코어</span>
-      <div class="score-inputs">
-        <input type="number" id="fGF" placeholder="득" min="0" max="99" />
-        <span class="score-sep">:</span>
-        <input type="number" id="fGA" placeholder="실" min="0" max="99" />
+    <div class="logo-wrap" id="logoWrap">
+      <span class="logo-empty" id="logoEmpty">⚽</span>
+    </div>
+  </div>
+  <div class="home-top-spacer"></div>
+
+  <input type="file" id="teamPhotoInput" accept="image/*" style="display:none" />
+  <input type="file" id="logoInput" accept="image/*" style="display:none" />
+
+  <div class="stats-section">
+    <div class="stat-box"><div class="stat-num w" id="sTotal">0</div><div class="stat-lbl">총 경기</div></div>
+    <div class="stat-box"><div class="stat-num g" id="sWin">0</div><div class="stat-lbl">승</div></div>
+    <div class="stat-box"><div class="stat-num" id="sWinRate" style="color:var(--text)">-</div><div class="stat-lbl">승률</div></div>
+    <div class="stat-box"><div class="stat-num y" id="sDraw">0</div><div class="stat-lbl">무</div></div>
+    <div class="stat-box"><div class="stat-num r" id="sLose">0</div><div class="stat-lbl">패</div></div>
+    <div class="stat-box">
+      <div class="stat-num" style="font-size:1.4rem;display:flex;align-items:center;justify-content:center;gap:4px;padding-top:4px;">
+        <span style="color:var(--green)" id="sGF">0</span>
+        <span style="color:var(--muted);font-size:1rem">:</span>
+        <span style="color:var(--red)" id="sGA">0</span>
       </div>
+      <div class="stat-lbl">득점:실점</div>
     </div>
-    <div class="form-group" style="margin-bottom:10px">
-      <span class="form-label">메모 (선택)</span>
-      <input type="text" id="fNote" placeholder="장소, 특이사항 등" />
+  </div>
+  <div class="bar-section">
+    <div class="bar-track">
+      <div class="bar-seg bs-win" id="barWin" style="width:0%"></div>
+      <div class="bar-seg bs-draw" id="barDraw" style="width:0%"></div>
+      <div class="bar-seg bs-lose" id="barLose" style="width:0%"></div>
     </div>
-    <button class="btn-save" onclick="addMatch()">저장</button>
+    <div class="bar-labels">
+      <span><span class="bar-dot" style="background:var(--green)"></span>승</span>
+      <span><span class="bar-dot" style="background:var(--yellow)"></span>무</span>
+      <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
+    </div>
+  </div>
+  <!-- TOP SCORERS PREVIEW -->
+  <div style="padding:0 1.5rem 1.5rem;">
+    <div class="section-header">
+      <span class="section-title">🏆 득점 순위</span>
+      <button class="btn-add-schedule" id="btnGoToPlayers">전체 보기</button>
+    </div>
+    <div id="topScorersPreview"><div class="no-schedule">경기 기록이 없어요.</div></div>
   </div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" onclick="setFilter('all',this)">전체</button>
-  <button class="tab" onclick="setFilter('win',this)">승</button>
-  <button class="tab" onclick="setFilter('draw',this)">무</button>
-  <button class="tab" onclick="setFilter('lose',this)">패</button>
+<!-- MATCHES PAGE -->
+<div class="page" id="page-matches">
+  <!-- 일정 섹션 -->
+  <div class="schedule-section" style="padding-top:1.5rem;">
+    <div class="section-header">
+      <span class="section-title">📅 다음 경기</span>
+      <button class="btn-add-schedule" id="btnAddSchedule">+ 일정 추가</button>
+    </div>
+    <div id="scheduleList"><div class="loading">불러오는 중...</div></div>
+  </div>
+  <!-- 경기 결과 추가 -->
+  <div class="add-section">
+    <button class="add-toggle" id="btnAddMatch">+ 경기 결과 추가</button>
+    <div class="add-form" id="addForm">
+      <div class="form-row">
+        <div class="form-group">
+          <span class="form-label">상대 팀</span>
+          <input type="text" id="fOpp" placeholder="상대 팀 이름" />
+        </div>
+        <div class="form-group">
+          <span class="form-label">날짜</span>
+          <input type="date" id="fDate" />
+        </div>
+      </div>
+      <div class="score-row">
+        <span class="score-lbl">스코어</span>
+        <div class="score-inputs">
+          <input type="number" id="fGF" placeholder="득" min="0" max="99" />
+          <span class="score-sep">:</span>
+          <input type="number" id="fGA" placeholder="실" min="0" max="99" />
+        </div>
+      </div>
+      <div class="scorer-section">
+        <div class="scorer-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>👥 참여 인원 <span id="addParticipantCount" style="color:var(--green)"></span></span>
+          <button type="button" id="btnSelectAll" style="font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">전체 선택</button>
+        </div>
+        <div class="scorer-list" id="addParticipantList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
+      </div>
+      <div class="scorer-section">
+        <div class="scorer-title">⚽ 득점자 선택 (선택사항)</div>
+        <div class="scorer-list" id="addScorerList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <span class="form-label">메모 (선택)</span>
+        <input type="text" id="fNote" placeholder="장소, 특이사항 등" />
+      </div>
+      <button class="btn-save" id="btnSaveMatch">저장</button>
+    </div>
+  </div>
+  <div class="filter-tabs">
+    <button class="ftab active" data-filter="all">전체</button>
+    <button class="ftab" data-filter="win">승</button>
+    <button class="ftab" data-filter="draw">무</button>
+    <button class="ftab" data-filter="lose">패</button>
+  </div>
+  <div class="match-list" id="matchList"><div class="loading">불러오는 중...</div></div>
 </div>
 
-<div class="match-list" id="matchList"><div class="loading">불러오는 중...</div></div>
+<!-- PLAYERS PAGE -->
+<div class="page" id="page-players">
+  <div class="players-section">
+    <div id="addPlayerSection" style="display:none;">
+      <div class="add-player-form">
+        <input type="text" id="playerNameInput" placeholder="팀원 이름 입력" />
+        <button class="btn-add-player" id="btnSavePlayer">추가</button>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">👥 선수단 · 득점 순위</span>
+      <button class="btn-add-schedule" id="btnToggleAddPlayer">+ 팀원 추가</button>
+    </div>
+    <div id="playerList"><div class="loading">불러오는 중...</div></div>
+  </div>
+</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, onValue, set, remove, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2L91xBKBxCakJ_9blufR3MMQPujnJ7bI",
@@ -310,308 +460,559 @@
   const db = getDatabase(app);
 
   const ADMIN_PW = 'goal';
-  let matches = [];
-  let schedules = [];
+  let matches = [], schedules = [], players = [];
   let teamName = 'FC TEAM';
-  let filter = 'all';
+  let matchFilter = 'all';
   let adminUnlocked = false;
   let pendingAction = null;
   let pendingScheduleId = null;
+  let editingMatchKey = null;
+  // scorer selections: { playerKey: goalCount }
+  let addScorerSel = {}, resultScorerSel = {}, editScorerSel = {};
+  // participant selections: Set of playerKeys
+  let addParticipantSel = new Set(), resultParticipantSel = new Set();
 
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 
-  // Firebase 실시간 구독
-  onValue(ref(db, 'teamName'), snap => {
-    teamName = snap.val() || 'FC TEAM';
+  // ── Firebase listeners ──
+  onValue(ref(db, 'teamName'), s => {
+    teamName = s.val() || 'FC TEAM';
     document.getElementById('teamTitle').textContent = teamName;
   });
-
-  onValue(ref(db, 'matches'), snap => {
-    const data = snap.val();
-    matches = data ? Object.entries(data).map(([k,v]) => ({...v, _key: k})).sort((a,b) => b.id - a.id) : [];
-    render();
+  onValue(ref(db, 'matches'), s => {
+    const d = s.val();
+    matches = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})).sort((a,b) => b.id-a.id) : [];
+    renderStats(); renderMatchList(); renderTopScorers(); renderPlayerList();
   });
-
-  onValue(ref(db, 'schedules'), snap => {
-    const data = snap.val();
-    schedules = data ? Object.entries(data).map(([k,v]) => ({...v, _key: k})) : [];
+  onValue(ref(db, 'schedules'), s => {
+    const d = s.val();
+    schedules = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})) : [];
     renderSchedules();
   });
+  onValue(ref(db, 'players'), s => {
+    const d = s.val();
+    players = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})) : [];
+    renderPlayerList(); renderAddScorerChips(); renderTopScorers();
+  });
 
+  onValue(ref(db, 'teamPhoto'), s => { renderTeamPhoto(s.val()); });
+  onValue(ref(db, 'teamLogo'), s => { renderTeamLogo(s.val()); });
+
+  // ── Team photo & logo ──
+  function renderTeamPhoto(url) {
+    const wrap = document.getElementById('teamPhotoWrap');
+    if (url) {
+      wrap.innerHTML = `
+        <div class="team-photo-wrap">
+          <img src="${url}" alt="단체사진" />
+          <div class="team-photo-overlay">
+            <button class="btn-photo-edit" id="btnChangePhoto">사진 변경</button>
+            <button class="btn-photo-edit" id="btnDeletePhoto" style="background:rgba(255,68,68,0.7)">삭제</button>
+          </div>
+        </div>`;
+      document.getElementById('btnChangePhoto').addEventListener('click', () => requestAdmin('photo'));
+      document.getElementById('btnDeletePhoto').addEventListener('click', () => requestAdmin('deletephoto'));
+    } else {
+      wrap.innerHTML = `<div class="team-photo-empty" id="teamPhotoEmpty"><span style="font-size:28px">📸</span><span>단체 사진을 추가해보세요</span><span style="font-size:11px;color:var(--muted)">(관리자만 변경 가능)</span></div>`;
+      document.getElementById('teamPhotoEmpty').addEventListener('click', () => requestAdmin('photo'));
+    }
+  }
+
+  function renderTeamLogo(url) {
+    const wrap = document.getElementById('logoWrap');
+    if (url) {
+      wrap.innerHTML = `<img src="${url}" alt="로고" />`;
+    } else {
+      wrap.innerHTML = `<span class="logo-empty" id="logoEmpty">⚽</span>`;
+    }
+    wrap.onclick = () => requestAdmin('logo');
+  }
+
+  function compressImage(file, maxW, maxH, quality) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = h * maxW / w; w = maxW; }
+          if (h > maxH) { w = w * maxH / h; h = maxH; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('teamPhotoInput').addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const b64 = await compressImage(file, 1200, 600, 0.75);
+    await set(ref(db, 'teamPhoto'), b64);
+    e.target.value = '';
+  });
+
+  document.getElementById('logoInput').addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const b64 = await compressImage(file, 300, 300, 0.85);
+    await set(ref(db, 'teamLogo'), b64);
+    e.target.value = '';
+  });
+
+
+  document.querySelectorAll('.nav-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    });
+  });
+  document.getElementById('btnGoToPlayers').addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-page="players"]').classList.add('active');
+    document.getElementById('page-players').classList.add('active');
+  });
+
+  // ── Stats ──
   function result(gf, ga) { return gf > ga ? 'win' : gf < ga ? 'lose' : 'draw'; }
 
-  function render() {
+  function renderStats() {
     const total = matches.length;
-    const wins = matches.filter(m => m.r === 'win').length;
-    const draws = matches.filter(m => m.r === 'draw').length;
-    const loses = matches.filter(m => m.r === 'lose').length;
+    const wins = matches.filter(m => m.r==='win').length;
+    const draws = matches.filter(m => m.r==='draw').length;
+    const loses = matches.filter(m => m.r==='lose').length;
     const gf = matches.reduce((s,m) => s+m.gf, 0);
     const ga = matches.reduce((s,m) => s+m.ga, 0);
-
     document.getElementById('sTotal').textContent = total;
     document.getElementById('sWin').textContent = wins;
     document.getElementById('sDraw').textContent = draws;
     document.getElementById('sLose').textContent = loses;
     document.getElementById('sGF').textContent = gf;
     document.getElementById('sGA').textContent = ga;
-    document.getElementById('sWinRate').textContent = total > 0 ? Math.round(wins/total*100) + '%' : '-';
-
+    document.getElementById('sWinRate').textContent = total > 0 ? Math.round(wins/total*100)+'%' : '-';
     if (total > 0) {
-      document.getElementById('barWin').style.width = Math.round(wins/total*100) + '%';
-      document.getElementById('barDraw').style.width = Math.round(draws/total*100) + '%';
-      document.getElementById('barLose').style.width = Math.round(loses/total*100) + '%';
-    } else {
-      ['barWin','barDraw','barLose'].forEach(id => document.getElementById(id).style.width = '0%');
-    }
-
+      document.getElementById('barWin').style.width = Math.round(wins/total*100)+'%';
+      document.getElementById('barDraw').style.width = Math.round(draws/total*100)+'%';
+      document.getElementById('barLose').style.width = Math.round(loses/total*100)+'%';
+    } else { ['barWin','barDraw','barLose'].forEach(id => document.getElementById(id).style.width='0%'); }
     const tag = document.getElementById('streakTag');
-    if (total === 0) {
-      tag.textContent = '기록 없음'; tag.className = 'streak-tag streak-none';
-    } else {
-      let cnt = 1, last = matches[0].r;
-      for (let i = 1; i < matches.length; i++) {
-        if (matches[i].r === last) cnt++; else break;
-      }
-      const labels = {win:'연승',lose:'연패',draw:'연무'};
-      const cls = {win:'streak-win',lose:'streak-lose',draw:'streak-draw'};
-      tag.textContent = cnt + ' ' + labels[last]; tag.className = 'streak-tag ' + cls[last];
-    }
-
-    renderList();
+    if (!total) { tag.textContent='기록 없음'; tag.className='streak-tag streak-none'; return; }
+    let cnt=1, last=matches[0].r;
+    for (let i=1;i<matches.length;i++) { if(matches[i].r===last) cnt++; else break; }
+    const labels={win:'연승',lose:'연패',draw:'연무'}, cls={win:'streak-win',lose:'streak-lose',draw:'streak-draw'};
+    tag.textContent=cnt+' '+labels[last]; tag.className='streak-tag '+cls[last];
   }
 
-  function renderList() {
-    const filtered = filter === 'all' ? matches : matches.filter(m => m.r === filter);
+  // ── Goal tally ──
+  function getGoalTally() {
+    const tally = {};
+    matches.forEach(m => {
+      if (!m.scorers) return;
+      Object.entries(m.scorers).forEach(([pKey, cnt]) => { tally[pKey] = (tally[pKey]||0) + cnt; });
+    });
+    return tally;
+  }
+
+  function renderTopScorers() {
+    const tally = getGoalTally();
+    const sorted = players.map(p => ({...p, goals: tally[p._key]||0})).filter(p => p.goals > 0).sort((a,b) => b.goals-a.goals).slice(0,5);
+    const el = document.getElementById('topScorersPreview');
+    if (!sorted.length) { el.innerHTML = '<div class="no-schedule">득점 기록이 없어요.</div>'; return; }
+    el.innerHTML = sorted.map((p,i) => `
+      <div class="player-card" style="margin-bottom:6px;">
+        <div class="player-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+        <div class="player-avatar">${p.name.charAt(0)}</div>
+        <div class="player-info"><div class="player-name">${p.name}</div></div>
+        <div style="text-align:center"><div class="player-goals">${p.goals}</div><div class="player-goals-lbl">골</div></div>
+      </div>`).join('');
+  }
+
+  // ── Match list ──
+  function renderMatchList() {
+    const filtered = matchFilter==='all' ? matches : matches.filter(m => m.r===matchFilter);
     const el = document.getElementById('matchList');
-    if (filtered.length === 0) {
-      el.innerHTML = '<div class="empty">아직 경기 기록이 없어요.<br>첫 번째 경기를 추가해보세요! ⚽</div>';
-      return;
-    }
-    const rlabel = {win:'W', lose:'L', draw:'D'};
-    const rcls = {win:'rb-win', lose:'rb-lose', draw:'rb-draw'};
+    if (!filtered.length) { el.innerHTML='<div class="empty">경기 기록이 없어요.<br>첫 번째 경기를 추가해보세요! ⚽</div>'; return; }
+    const rl={win:'W',lose:'L',draw:'D'}, rc={win:'rb-win',lose:'rb-lose',draw:'rb-draw'};
     el.innerHTML = filtered.map(m => {
-      const d = m.date ? m.date.replace(/-/g, '.') : '';
-      const diff = m.gf - m.ga;
-      const diffStr = diff > 0 ? '+'+diff : diff;
-      return `<div class="match-card ${m.r}">
-        <span class="result-badge ${rcls[m.r]}">${rlabel[m.r]}</span>
+      const d = m.date ? m.date.replace(/-/g,'.') : '';
+      const diff = m.gf-m.ga, diffStr = diff>0?'+'+diff:diff;
+      let scorerNames = '';
+      if (m.scorers) {
+        const names = Object.entries(m.scorers).map(([k,cnt]) => {
+          const p = players.find(p => p._key===k);
+          return p ? (cnt>1 ? `${p.name}x${cnt}` : p.name) : null;
+        }).filter(Boolean);
+        if (names.length) scorerNames = `<div class="match-scorers">⚽ ${names.join(', ')}</div>`;
+      }
+      const participantCount = m.participants ? m.participants.length : null;
+      const participantHtml = participantCount ? `<div class="match-scorers" style="color:var(--muted)">👥 ${participantCount}명 참여</div>` : '';
+      return `<div class="match-card ${m.r}" data-key="${m._key}">
+        <span class="result-badge ${rc[m.r]}">${rl[m.r]}</span>
         <div class="match-info">
           <div class="match-opp">vs ${m.opp}</div>
-          <div class="match-meta">${d}${m.note ? ' · ' + m.note : ''} &nbsp;(${diffStr})</div>
+          <div class="match-meta">${d}${m.note?' · '+m.note:''} &nbsp;(${diffStr})</div>
+          ${scorerNames}${participantHtml}
         </div>
         <div class="match-score">${m.gf}:${m.ga}</div>
-        <button class="del-btn" onclick="window._requestAdmin('delete:${m._key}')" title="삭제">✕</button>
+        <button class="del-btn" data-delkey="${m._key}" title="삭제">✕</button>
       </div>`;
     }).join('');
+    el.querySelectorAll('.match-card').forEach(card => {
+      card.addEventListener('click', e => {
+        if (e.target.closest('.del-btn')) return;
+        openMatchDetail(card.dataset.key);
+      });
+    });
+    el.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); requestAdmin('delete:'+btn.dataset.delkey); });
+    });
   }
 
-  function renderSchedules() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const upcoming = schedules.filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d >= today; }).sort((a,b) => new Date(a.date)-new Date(b.date));
-    const past = schedules.filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d < today; }).sort((a,b) => new Date(b.date)-new Date(a.date));
-    const el = document.getElementById('scheduleList');
-    let html = '';
-    if (upcoming.length === 0 && past.length === 0) { el.innerHTML = '<div class="no-schedule">등록된 일정이 없어요.</div>'; return; }
-    if (upcoming.length === 0) html += '<div class="no-schedule">예정된 경기가 없어요.</div>';
-    else {
-      html += upcoming.map(s => {
-        const d = new Date(s.date); d.setHours(0,0,0,0);
-        const diff = Math.round((d - today) / (1000*60*60*24));
-        const isToday = diff === 0;
-        const cardCls = isToday ? 'today' : diff <= 3 ? 'soon' : '';
-        const label = isToday ? '오늘!' : diff === 1 ? '내일' : 'D-' + diff;
-        const meta = [s.date.replace(/-/g,'.'), s.time, s.place].filter(Boolean).join(' · ');
-        return `<div class="schedule-card ${cardCls}">
-          <div class="countdown-box">
-            <div class="countdown-num ${isToday?'today':''}">${label}</div>
-            <div class="countdown-lbl">${isToday ? 'TODAY' : diff+'days'}</div>
-          </div>
-          <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
-          <button class="schedule-del" onclick="window._requestAdmin('delschedule:${s._key}')">✕</button>
-        </div>`;
-      }).join('');
-    }
-    if (past.length > 0) {
-      html += `<div class="past-section-title">⏰ 결과 미입력</div>`;
-      html += past.map(s => {
-        const meta = [s.date.replace(/-/g,'.'), s.time, s.place].filter(Boolean).join(' · ');
-        return `<div class="schedule-card past">
-          <div class="countdown-box"><div class="countdown-num" style="color:var(--muted);font-size:1.1rem">종료</div><div class="countdown-lbl">ENDED</div></div>
-          <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
-          <button class="btn-enter-result" onclick="window._requestAdmin('enterresult:${s._key}')">결과 입력</button>
-        </div>`;
-      }).join('');
-    }
-    el.innerHTML = html;
+  // ── Filter tabs ──
+  document.querySelectorAll('.ftab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      matchFilter = btn.dataset.filter;
+      document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMatchList();
+    });
+  });
+
+  // ── Scorer chips ──
+  function buildScorerChips(containerId, selObj) {
+    const el = document.getElementById(containerId);
+    if (!players.length) { el.innerHTML='<div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div>'; return; }
+    el.innerHTML = players.map(p => {
+      const cnt = selObj[p._key] || 0;
+      return `<button class="scorer-chip ${cnt>0?'selected':''}" data-pkey="${p._key}">
+        ${p.name}${cnt>0?`<span class="goal-count">${cnt}골</span>`:''}
+      </button>`;
+    }).join('');
+    el.querySelectorAll('.scorer-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const k = chip.dataset.pkey;
+        selObj[k] = ((selObj[k]||0) + 1) % 6;
+        buildScorerChips(containerId, selObj);
+      });
+    });
   }
 
-  async function addMatch() {
+  function renderAddScorerChips() { buildScorerChips('addScorerList', addScorerSel); }
+
+  function buildParticipantChips(containerId, selSet, countId) {
+    const el = document.getElementById(containerId);
+    if (!players.length) { el.innerHTML='<div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div>'; return; }
+    el.innerHTML = players.map(p => {
+      const sel = selSet.has(p._key);
+      return `<button class="participant-chip ${sel?'selected':''}" data-pkey="${p._key}">
+        <span class="check">${sel?'✓':''}</span>${p.name}
+      </button>`;
+    }).join('');
+    const countEl = document.getElementById(countId);
+    if (countEl) countEl.textContent = selSet.size > 0 ? `(${selSet.size}명)` : '';
+    el.querySelectorAll('.participant-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const k = chip.dataset.pkey;
+        if (selSet.has(k)) selSet.delete(k); else selSet.add(k);
+        buildParticipantChips(containerId, selSet, countId);
+      });
+    });
+  }
+
+  function renderAddParticipantChips() { buildParticipantChips('addParticipantList', addParticipantSel, 'addParticipantCount'); }
+
+  document.getElementById('btnSelectAll').addEventListener('click', () => {
+    if (addParticipantSel.size === players.length) addParticipantSel.clear();
+    else players.forEach(p => addParticipantSel.add(p._key));
+    renderAddParticipantChips();
+  });
+  document.getElementById('btnResultSelectAll').addEventListener('click', () => {
+    if (resultParticipantSel.size === players.length) resultParticipantSel.clear();
+    else players.forEach(p => resultParticipantSel.add(p._key));
+    buildParticipantChips('resultParticipantList', resultParticipantSel, 'resultParticipantCount');
+  });
+
+  // ── Add match ──
+  document.getElementById('btnAddMatch').addEventListener('click', () => requestAdmin('toggle'));
+  document.getElementById('btnSaveMatch').addEventListener('click', async () => {
     const opp = document.getElementById('fOpp').value.trim();
     const date = document.getElementById('fDate').value;
     const gf = parseInt(document.getElementById('fGF').value);
     const ga = parseInt(document.getElementById('fGA').value);
     const note = document.getElementById('fNote').value.trim();
     if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
-    if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
-    await push(ref(db, 'matches'), { id: Date.now(), opp, date, gf, ga, note, r: result(gf, ga) });
-    document.getElementById('fOpp').value = '';
-    document.getElementById('fGF').value = '';
-    document.getElementById('fGA').value = '';
-    document.getElementById('fNote').value = '';
-  }
+    if (isNaN(gf)||isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
+    const scorers = {};
+    Object.entries(addScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
+    const participants = Array.from(addParticipantSel);
+    await push(ref(db,'matches'), { id:Date.now(), opp, date, gf, ga, note, r:result(gf,ga), scorers, participants });
+    document.getElementById('fOpp').value='';
+    document.getElementById('fGF').value='';
+    document.getElementById('fGA').value='';
+    document.getElementById('fNote').value='';
+    addScorerSel = {}; addParticipantSel = new Set();
+    renderAddScorerChips(); renderAddParticipantChips();
+    document.getElementById('addForm').classList.remove('open');
+  });
 
+  // ── Match detail modal ──
+  function openMatchDetail(key) {
+    const m = matches.find(m => m._key===key);
+    if (!m) return;
+    editingMatchKey = key;
+    document.getElementById('scorersModalTitle').textContent = `vs ${m.opp} ${m.gf}:${m.ga}`;
+    let html = `<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">${m.date?m.date.replace(/-/g,'.'):''}${m.note?' · '+m.note:''}</div>`;
+    if (m.participants && m.participants.length) {
+      const names = m.participants.map(k => { const p=players.find(p=>p._key===k); return p?p.name:null; }).filter(Boolean);
+      html += `<div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">👥 참여 인원 (${names.length}명)</div>`;
+      html += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">${names.map(n=>`<span style="font-size:12px;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--text);">${n}</span>`).join('')}</div>`;
+    }
+    if (m.scorers && Object.keys(m.scorers).length) {
+      html += `<div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">득점자</div>`;
+      html += Object.entries(m.scorers).map(([k,cnt]) => {
+        const p = players.find(p => p._key===k);
+        return p ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+          <div class="player-avatar" style="width:30px;height:30px;font-size:13px;">${p.name.charAt(0)}</div>
+          <span style="flex:1;font-size:14px;">${p.name}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--green);">${cnt}골</span>
+        </div>` : '';
+      }).join('');
+    } else {
+      html += `<div style="font-size:13px;color:var(--muted);padding:1rem 0;text-align:center;">득점자 기록이 없어요.</div>`;
+    }
+    document.getElementById('scorersModalContent').innerHTML = html;
+    document.getElementById('scorersModal').classList.add('open');
+  }
+  document.getElementById('btnScorersClose').addEventListener('click', () => document.getElementById('scorersModal').classList.remove('open'));
+  document.getElementById('btnEditScorers').addEventListener('click', () => requestAdmin('editscorers'));
+
+  // ── Edit scorers ──
+  function openEditScorers() {
+    const m = matches.find(m => m._key===editingMatchKey);
+    if (!m) return;
+    editScorerSel = m.scorers ? {...m.scorers} : {};
+    document.getElementById('scorersModal').classList.remove('open');
+    buildScorerChips('editScorerList', editScorerSel);
+    document.getElementById('editScorersModal').classList.add('open');
+  }
+  document.getElementById('btnEditScorersCancel').addEventListener('click', () => document.getElementById('editScorersModal').classList.remove('open'));
+  document.getElementById('btnEditScorersConfirm').addEventListener('click', async () => {
+    const scorers = {};
+    Object.entries(editScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
+    await update(ref(db,'matches/'+editingMatchKey), { scorers });
+    document.getElementById('editScorersModal').classList.remove('open');
+  });
+
+  // ── Delete match ──
   async function delMatch(key) {
     if (!confirm('이 경기 기록을 삭제할까요?')) return;
-    await remove(ref(db, 'matches/' + key));
+    await remove(ref(db,'matches/'+key));
   }
 
-  function setFilter(f, btn) {
-    filter = f;
-    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderList();
-  }
-  window.setFilter = setFilter;
+  // ── Players ──
+  document.getElementById('btnToggleAddPlayer').addEventListener('click', () => requestAdmin('addplayer'));
+  document.getElementById('btnSavePlayer').addEventListener('click', async () => {
+    const name = document.getElementById('playerNameInput').value.trim();
+    if (!name) { alert('이름을 입력해주세요.'); return; }
+    if (players.find(p => p.name===name)) { alert('이미 있는 팀원이에요.'); return; }
+    await push(ref(db,'players'), { name, joinedAt: Date.now() });
+    document.getElementById('playerNameInput').value='';
+  });
+  document.getElementById('playerNameInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnSavePlayer').click(); });
 
+  function renderPlayerList() {
+    const tally = getGoalTally();
+    const sorted = players.map(p => ({...p, goals:tally[p._key]||0})).sort((a,b) => b.goals-a.goals);
+    const el = document.getElementById('playerList');
+    if (!sorted.length) { el.innerHTML='<div class="empty">등록된 팀원이 없어요.<br>팀원 추가 버튼을 눌러주세요!</div>'; return; }
+    el.innerHTML = sorted.map((p,i) => `
+      <div class="player-card">
+        <div class="player-rank ${i===0&&p.goals>0?'gold':i===1&&p.goals>0?'silver':i===2&&p.goals>0?'bronze':''}">${i+1}</div>
+        <div class="player-avatar">${p.name.charAt(0)}</div>
+        <div class="player-info">
+          <div class="player-name">${p.name}</div>
+          <div class="player-stats">${p.goals > 0 ? p.goals+'골' : '득점 없음'}</div>
+        </div>
+        <div style="text-align:center;min-width:40px">
+          <div class="player-goals">${p.goals}</div>
+          <div class="player-goals-lbl">골</div>
+        </div>
+        <button class="del-player-btn" data-pkey="${p._key}">✕</button>
+      </div>`).join('');
+    el.querySelectorAll('.del-player-btn').forEach(btn => {
+      btn.addEventListener('click', () => requestAdmin('delplayer:'+btn.dataset.pkey));
+    });
+  }
+
+  async function delPlayer(key) {
+    if (!confirm('이 팀원을 삭제할까요?')) return;
+    await remove(ref(db,'players/'+key));
+  }
+
+  // ── Schedules ──
+  document.getElementById('btnAddSchedule').addEventListener('click', () => requestAdmin('schedule'));
+
+  function renderSchedules() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = schedules.filter(s => { const d=new Date(s.date); d.setHours(0,0,0,0); return d>=today; }).sort((a,b) => new Date(a.date)-new Date(b.date));
+    const past = schedules.filter(s => { const d=new Date(s.date); d.setHours(0,0,0,0); return d<today; }).sort((a,b) => new Date(b.date)-new Date(a.date));
+    const el = document.getElementById('scheduleList');
+    let html = '';
+    if (!upcoming.length && !past.length) { el.innerHTML='<div class="no-schedule">등록된 일정이 없어요.</div>'; return; }
+    if (!upcoming.length) html += '<div class="no-schedule">예정된 경기가 없어요.</div>';
+    else html += upcoming.map(s => {
+      const d=new Date(s.date); d.setHours(0,0,0,0);
+      const diff=Math.round((d-today)/(1000*60*60*24)), isToday=diff===0;
+      const label=isToday?'오늘!':diff===1?'내일':'D-'+diff;
+      const meta=[s.date.replace(/-/g,'.'),s.time,s.place].filter(Boolean).join(' · ');
+      return `<div class="schedule-card ${isToday?'today':diff<=3?'soon':''}">
+        <div class="countdown-box"><div class="countdown-num ${isToday?'today':''}">${label}</div><div class="countdown-lbl">${isToday?'TODAY':diff+'days'}</div></div>
+        <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
+        <button class="schedule-del" data-skey="${s._key}">✕</button>
+      </div>`;
+    }).join('');
+    if (past.length) {
+      html += `<div class="past-section-title">⏰ 결과 미입력</div>`;
+      html += past.map(s => {
+        const meta=[s.date.replace(/-/g,'.'),s.time,s.place].filter(Boolean).join(' · ');
+        return `<div class="schedule-card past">
+          <div class="countdown-box"><div class="countdown-num" style="color:var(--muted);font-size:1.1rem">종료</div><div class="countdown-lbl">ENDED</div></div>
+          <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
+          <button class="btn-enter-result" data-skey="${s._key}">결과 입력</button>
+        </div>`;
+      }).join('');
+    }
+    el.innerHTML = html;
+    el.querySelectorAll('.schedule-del').forEach(btn => btn.addEventListener('click', () => requestAdmin('delschedule:'+btn.dataset.skey)));
+    el.querySelectorAll('.btn-enter-result').forEach(btn => btn.addEventListener('click', () => requestAdmin('enterresult:'+btn.dataset.skey)));
+  }
+
+  document.getElementById('btnSchedConfirm').addEventListener('click', async () => {
+    const opp=document.getElementById('sOpp').value.trim(), date=document.getElementById('sDate').value;
+    const time=document.getElementById('sTime').value, place=document.getElementById('sPlace').value.trim();
+    if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
+    if (!date) { alert('날짜를 입력해주세요.'); return; }
+    await push(ref(db,'schedules'), {id:Date.now(),opp,date,time,place});
+    document.getElementById('scheduleModal').classList.remove('open');
+  });
+  document.getElementById('btnSchedCancel').addEventListener('click', () => document.getElementById('scheduleModal').classList.remove('open'));
+
+  // ── Result from schedule ──
+  document.getElementById('btnResultConfirm').addEventListener('click', async () => {
+    const gf=parseInt(document.getElementById('rGF').value), ga=parseInt(document.getElementById('rGA').value);
+    const note=document.getElementById('rNote').value.trim();
+    if (isNaN(gf)||isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
+    const s=schedules.find(s => s._key===pendingScheduleId);
+    if (!s) return;
+    const scorers={};
+    Object.entries(resultScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
+    const participants = Array.from(resultParticipantSel);
+    await push(ref(db,'matches'), {id:Date.now(),opp:s.opp,date:s.date,gf,ga,note,r:result(gf,ga),scorers,participants});
+    await remove(ref(db,'schedules/'+pendingScheduleId));
+    document.getElementById('resultModal').classList.remove('open');
+    pendingScheduleId=null; resultScorerSel={}; resultParticipantSel=new Set();
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-page="matches"]').classList.add('active');
+    document.getElementById('page-matches').classList.add('active');
+  });
+  document.getElementById('btnResultCancel').addEventListener('click', () => { document.getElementById('resultModal').classList.remove('open'); pendingScheduleId=null; });
+
+  // ── Admin ──
   function requestAdmin(action) {
     if (adminUnlocked) { executeAction(action); return; }
     pendingAction = action;
     document.getElementById('pwModal').classList.add('open');
     setTimeout(() => document.getElementById('pwInput').focus(), 100);
   }
-  window._requestAdmin = requestAdmin;
-  window.requestAdmin = requestAdmin;
 
-  function checkPw() {
+  document.getElementById('btnPwConfirm').addEventListener('click', () => {
     const pw = document.getElementById('pwInput').value;
     if (pw === ADMIN_PW) {
       adminUnlocked = true;
-      closeModal();
-      if (pendingAction) { executeAction(pendingAction); pendingAction = null; }
+      document.getElementById('pwModal').classList.remove('open');
+      document.getElementById('pwInput').value = '';
+      if (pendingAction) { executeAction(pendingAction); pendingAction=null; }
     } else {
       alert('비밀번호가 틀렸어요.');
-      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').value='';
     }
-  }
-  window.checkPw = checkPw;
+  });
+  document.getElementById('btnPwCancel').addEventListener('click', () => { document.getElementById('pwModal').classList.remove('open'); document.getElementById('pwInput').value=''; });
+  document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnPwConfirm').click(); });
 
   function executeAction(action) {
-    if (action === 'toggle') {
-      const f = document.getElementById('addForm');
+    if (action==='toggle') {
+      const f=document.getElementById('addForm');
       f.classList.toggle('open');
-      if (f.classList.contains('open')) setTimeout(() => document.getElementById('fOpp').focus(), 50);
+      if (f.classList.contains('open')) { renderAddScorerChips(); renderAddParticipantChips(); setTimeout(()=>document.getElementById('fOpp').focus(),50); }
     } else if (action.startsWith('delete:')) {
       delMatch(action.split(':')[1]);
-    } else if (action === 'schedule') {
-      openScheduleModal();
+    } else if (action==='schedule') {
+      document.getElementById('sDate').value=new Date().toISOString().split('T')[0];
+      document.getElementById('sOpp').value=''; document.getElementById('sTime').value=''; document.getElementById('sPlace').value='';
+      document.getElementById('scheduleModal').classList.add('open');
+      setTimeout(()=>document.getElementById('sOpp').focus(),100);
     } else if (action.startsWith('delschedule:')) {
-      delSchedule(action.split(':')[1]);
+      const key=action.split(':')[1];
+      if (confirm('이 일정을 삭제할까요?')) remove(ref(db,'schedules/'+key));
     } else if (action.startsWith('enterresult:')) {
-      openResultModal(action.split(':')[1]);
-    } else if (action === 'teamname') {
-      document.getElementById('nameInput').value = teamName;
+      const key=action.split(':')[1];
+      const s=schedules.find(s=>s._key===key); if(!s) return;
+      pendingScheduleId=key; resultScorerSel={}; resultParticipantSel=new Set();
+      document.getElementById('resultModalSub').textContent=`vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
+      document.getElementById('rGF').value=''; document.getElementById('rGA').value='';
+      document.getElementById('rNote').value=s.place||'';
+      buildScorerChips('resultScorerList', resultScorerSel);
+      buildParticipantChips('resultParticipantList', resultParticipantSel, 'resultParticipantCount');
+      document.getElementById('resultModal').classList.add('open');
+      setTimeout(()=>document.getElementById('rGF').focus(),100);
+    } else if (action==='teamname') {
+      document.getElementById('nameInput').value=teamName;
       document.getElementById('nameModal').classList.add('open');
-      setTimeout(() => document.getElementById('nameInput').focus(), 100);
+      setTimeout(()=>document.getElementById('nameInput').focus(),100);
+    } else if (action==='photo') {
+      document.getElementById('teamPhotoInput').click();
+    } else if (action==='logo') {
+      document.getElementById('logoInput').click();
+    } else if (action==='deletephoto') {
+      if (confirm('단체 사진을 삭제할까요?')) remove(ref(db,'teamPhoto'));
+    } else if (action==='addplayer') {
+      const sec=document.getElementById('addPlayerSection');
+      sec.style.display=sec.style.display==='none'?'block':'none';
+      if (sec.style.display==='block') setTimeout(()=>document.getElementById('playerNameInput').focus(),50);
+    } else if (action.startsWith('delplayer:')) {
+      delPlayer(action.split(':')[1]);
+    } else if (action==='editscorers') {
+      openEditScorers();
     }
   }
 
-  function closeModal() { document.getElementById('pwModal').classList.remove('open'); document.getElementById('pwInput').value = ''; }
-  window.closeModal = closeModal;
-  document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+  // ── Team name ──
+  document.getElementById('teamTitle').addEventListener('click', () => requestAdmin('teamname'));
+  document.getElementById('btnNameConfirm').addEventListener('click', async () => {
+    const n=document.getElementById('nameInput').value.trim();
+    if (n) await set(ref(db,'teamName'),n);
+    document.getElementById('nameModal').classList.remove('open');
+  });
+  document.getElementById('btnNameCancel').addEventListener('click', () => document.getElementById('nameModal').classList.remove('open'));
+  document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnNameConfirm').click(); });
 
-  function openNameModal() {
-    if (!adminUnlocked) { requestAdmin('teamname'); return; }
-    document.getElementById('nameInput').value = teamName;
-    document.getElementById('nameModal').classList.add('open');
-    setTimeout(() => document.getElementById('nameInput').focus(), 100);
-  }
-  window.openNameModal = openNameModal;
-  function closeNameModal() { document.getElementById('nameModal').classList.remove('open'); }
-  window.closeNameModal = closeNameModal;
-  async function saveTeamName() {
-    const n = document.getElementById('nameInput').value.trim();
-    if (n) await set(ref(db, 'teamName'), n);
-    closeNameModal();
-  }
-  window.saveTeamName = saveTeamName;
-  document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveTeamName(); });
-
-  function openScheduleModal() {
-    document.getElementById('sDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('sOpp').value = '';
-    document.getElementById('sTime').value = '';
-    document.getElementById('sPlace').value = '';
-    document.getElementById('scheduleModal').classList.add('open');
-    setTimeout(() => document.getElementById('sOpp').focus(), 100);
-  }
-  function closeScheduleModal() { document.getElementById('scheduleModal').classList.remove('open'); }
-  window.closeScheduleModal = closeScheduleModal;
-  async function saveSchedule() {
-    const opp = document.getElementById('sOpp').value.trim();
-    const date = document.getElementById('sDate').value;
-    const time = document.getElementById('sTime').value;
-    const place = document.getElementById('sPlace').value.trim();
-    if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
-    if (!date) { alert('날짜를 입력해주세요.'); return; }
-    await push(ref(db, 'schedules'), { id: Date.now(), opp, date, time, place });
-    closeScheduleModal();
-  }
-  window.saveSchedule = saveSchedule;
-  async function delSchedule(key) {
-    if (!confirm('이 일정을 삭제할까요?')) return;
-    await remove(ref(db, 'schedules/' + key));
-  }
-
-  function openResultModal(key) {
-    const s = schedules.find(s => s._key === key);
-    if (!s) return;
-    pendingScheduleId = key;
-    document.getElementById('resultModalSub').textContent = `vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
-    document.getElementById('rGF').value = '';
-    document.getElementById('rGA').value = '';
-    document.getElementById('rNote').value = s.place || '';
-    document.getElementById('resultModal').classList.add('open');
-    setTimeout(() => document.getElementById('rGF').focus(), 100);
-  }
-  function closeResultModal() { document.getElementById('resultModal').classList.remove('open'); pendingScheduleId = null; }
-  window.closeResultModal = closeResultModal;
-  async function saveResultFromSchedule() {
-    const gf = parseInt(document.getElementById('rGF').value);
-    const ga = parseInt(document.getElementById('rGA').value);
-    const note = document.getElementById('rNote').value.trim();
-    if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
-    const s = schedules.find(s => s._key === pendingScheduleId);
-    if (!s) return;
-    await push(ref(db, 'matches'), { id: Date.now(), opp: s.opp, date: s.date, gf, ga, note, r: result(gf, ga) });
-    await remove(ref(db, 'schedules/' + pendingScheduleId));
-    closeResultModal();
-    setFilter('all', document.querySelector('.tab'));
-    setTimeout(() => document.getElementById('matchList').scrollIntoView({ behavior: 'smooth' }), 300);
-  }
-  window.saveResultFromSchedule = saveResultFromSchedule;
-
-  window.addMatch = addMatch;
-
-  function shareKakao() {
-    const total = matches.length;
-    const wins = matches.filter(m => m.r === 'win').length;
-    const loses = matches.filter(m => m.r === 'lose').length;
-    const draws = matches.filter(m => m.r === 'draw').length;
-    const winRate = total > 0 ? Math.round(wins/total*100) : 0;
-    const desc = total > 0 ? `${total}경기 ${wins}승 ${draws}무 ${loses}패 · 승률 ${winRate}%` : '경기 기록을 확인해보세요!';
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: `${teamName} 경기 기록`, text: desc, url });
-    } else {
-      const text = `⚽ ${teamName} 경기 기록\n${desc}\n\n${url}`;
-      navigator.clipboard.writeText(text).then(() => alert('링크가 복사됐어요! 카톡에 붙여넣기 하세요 😊'));
-    }
-  }
-  window.shareKakao = shareKakao;
-
-  // 버튼 이벤트 직접 바인딩
-  document.getElementById('btnAddSchedule').addEventListener('click', () => requestAdmin('schedule'));
-  document.getElementById('btnAddMatch').addEventListener('click', () => requestAdmin('toggle'));
+  // ── Kakao share ──
+  document.getElementById('btnKakao').addEventListener('click', () => {
+    const total=matches.length, wins=matches.filter(m=>m.r==='win').length;
+    const loses=matches.filter(m=>m.r==='lose').length, draws=matches.filter(m=>m.r==='draw').length;
+    const winRate=total>0?Math.round(wins/total*100):0;
+    const desc=total>0?`${total}경기 ${wins}승 ${draws}무 ${loses}패 · 승률 ${winRate}%`:'경기 기록을 확인해보세요!';
+    const url=window.location.href;
+    if (navigator.share) navigator.share({title:`${teamName} 경기 기록`,text:desc,url});
+    else navigator.clipboard.writeText(`⚽ ${teamName} 경기 기록\n${desc}\n\n${url}`).then(()=>alert('링크가 복사됐어요! 카톡에 붙여넣기 하세요 😊'));
+  });
 </script>
 </body>
 </html>
