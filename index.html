@@ -161,7 +161,9 @@
   .add-player-form input { flex: 1; }
   .btn-add-player { padding: 9px 16px; background: var(--green); color: #000; font-weight: 700; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
 
-  .participant-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .mvp-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .mvp-chip.selected { background: rgba(255,184,0,0.15); border-color: var(--yellow); color: var(--yellow); }
+  .mvp-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--yellow); margin-top: 3px; } padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
   .participant-chip.selected { background: rgba(0,194,124,0.15); border-color: var(--green); color: var(--green); }
   .participant-chip .check { font-size: 11px; }
   @media (max-width: 400px) {
@@ -250,6 +252,10 @@
       <div class="scorer-title">⚽ 득점자 선택 (선택사항)</div>
       <div class="scorer-list" id="resultScorerList"></div>
     </div>
+    <div class="scorer-section">
+      <div class="scorer-title">🌟 MVP 선택 (선택사항)</div>
+      <div class="scorer-list" id="resultMvpList"></div>
+    </div>
     <div class="form-group" style="margin-bottom:0">
       <span class="form-label">메모 (선택)</span>
       <input type="text" id="rNote" placeholder="특이사항 등" />
@@ -268,7 +274,7 @@
     <div id="scorersModalContent"></div>
     <div style="display:flex;gap:8px;margin-top:1rem;">
       <button class="btn-cancel" style="flex:1" id="btnScorersClose">닫기</button>
-      <button class="btn-confirm" style="flex:2;background:var(--green)" id="btnEditScorers">득점자 수정</button>
+      <button class="btn-confirm" style="flex:2;background:var(--surface2);color:var(--text);border:1px solid var(--border)" id="btnEditScorers">득점자 수정</button>
     </div>
   </div>
 </div>
@@ -409,6 +415,10 @@
         <div class="scorer-title">⚽ 득점자 선택 (선택사항)</div>
         <div class="scorer-list" id="addScorerList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
       </div>
+      <div class="scorer-section">
+        <div class="scorer-title">🌟 MVP 선택 (선택사항)</div>
+        <div class="scorer-list" id="addMvpList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
+      </div>
       <div class="form-group" style="margin-bottom:10px">
         <span class="form-label">메모 (선택)</span>
         <input type="text" id="fNote" placeholder="장소, 특이사항 등" />
@@ -471,6 +481,8 @@
   let addScorerSel = {}, resultScorerSel = {}, editScorerSel = {};
   // participant selections: Set of playerKeys
   let addParticipantSel = new Set(), resultParticipantSel = new Set();
+  // MVP: playerKey or null
+  let addMvpSel = null, resultMvpSel = null;
 
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 
@@ -651,12 +663,14 @@
       }
       const participantCount = m.participants ? m.participants.length : null;
       const participantHtml = participantCount ? `<div class="match-scorers" style="color:var(--muted)">👥 ${participantCount}명 참여</div>` : '';
+      const mvpPlayer = m.mvp ? players.find(p=>p._key===m.mvp) : null;
+      const mvpHtml = mvpPlayer ? `<div class="mvp-badge">🌟 MVP ${mvpPlayer.name}</div>` : '';
       return `<div class="match-card ${m.r}" data-key="${m._key}">
         <span class="result-badge ${rc[m.r]}">${rl[m.r]}</span>
         <div class="match-info">
           <div class="match-opp">vs ${m.opp}</div>
           <div class="match-meta">${d}${m.note?' · '+m.note:''} &nbsp;(${diffStr})</div>
-          ${scorerNames}${participantHtml}
+          ${scorerNames}${participantHtml}${mvpHtml}
         </div>
         <div class="match-score">${m.gf}:${m.ga}</div>
         <button class="del-btn" data-delkey="${m._key}" title="삭제">✕</button>
@@ -726,6 +740,23 @@
 
   function renderAddParticipantChips() { buildParticipantChips('addParticipantList', addParticipantSel, 'addParticipantCount'); }
 
+  function buildMvpChips(containerId, currentMvp, onSelect) {
+    const el = document.getElementById(containerId);
+    if (!players.length) { el.innerHTML='<div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div>'; return; }
+    el.innerHTML = players.map(p => `
+      <button class="mvp-chip ${currentMvp===p._key?'selected':''}" data-pkey="${p._key}">
+        ${currentMvp===p._key?'🌟 ':''}${p.name}
+      </button>`).join('');
+    el.querySelectorAll('.mvp-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        onSelect(chip.dataset.pkey === currentMvp ? null : chip.dataset.pkey);
+      });
+    });
+  }
+
+  function renderAddMvpChips() { buildMvpChips('addMvpList', addMvpSel, v => { addMvpSel=v; renderAddMvpChips(); }); }
+  function renderResultMvpChips() { buildMvpChips('resultMvpList', resultMvpSel, v => { resultMvpSel=v; renderResultMvpChips(); }); }
+
   document.getElementById('btnSelectAll').addEventListener('click', () => {
     if (addParticipantSel.size === players.length) addParticipantSel.clear();
     else players.forEach(p => addParticipantSel.add(p._key));
@@ -750,13 +781,13 @@
     const scorers = {};
     Object.entries(addScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
     const participants = Array.from(addParticipantSel);
-    await push(ref(db,'matches'), { id:Date.now(), opp, date, gf, ga, note, r:result(gf,ga), scorers, participants });
+    await push(ref(db,'matches'), { id:Date.now(), opp, date, gf, ga, note, r:result(gf,ga), scorers, participants, mvp: addMvpSel||null });
     document.getElementById('fOpp').value='';
     document.getElementById('fGF').value='';
     document.getElementById('fGA').value='';
     document.getElementById('fNote').value='';
-    addScorerSel = {}; addParticipantSel = new Set();
-    renderAddScorerChips(); renderAddParticipantChips();
+    addScorerSel = {}; addParticipantSel = new Set(); addMvpSel = null;
+    renderAddScorerChips(); renderAddParticipantChips(); renderAddMvpChips();
     document.getElementById('addForm').classList.remove('open');
   });
 
@@ -767,6 +798,13 @@
     editingMatchKey = key;
     document.getElementById('scorersModalTitle').textContent = `vs ${m.opp} ${m.gf}:${m.ga}`;
     let html = `<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">${m.date?m.date.replace(/-/g,'.'):''}${m.note?' · '+m.note:''}</div>`;
+    if (m.mvp) {
+      const mvpP = players.find(p=>p._key===m.mvp);
+      if (mvpP) html += `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;">
+        <span style="font-size:1.4rem;">🌟</span>
+        <div><div style="font-size:11px;color:var(--yellow);letter-spacing:0.5px;text-transform:uppercase;">MVP</div><div style="font-size:15px;font-weight:700;">${mvpP.name}</div></div>
+      </div>`;
+    }
     if (m.participants && m.participants.length) {
       const names = m.participants.map(k => { const p=players.find(p=>p._key===k); return p?p.name:null; }).filter(Boolean);
       html += `<div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">👥 참여 인원 (${names.length}명)</div>`;
@@ -912,10 +950,10 @@
     const scorers={};
     Object.entries(resultScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
     const participants = Array.from(resultParticipantSel);
-    await push(ref(db,'matches'), {id:Date.now(),opp:s.opp,date:s.date,gf,ga,note,r:result(gf,ga),scorers,participants});
+    await push(ref(db,'matches'), {id:Date.now(),opp:s.opp,date:s.date,gf,ga,note,r:result(gf,ga),scorers,participants,mvp:resultMvpSel||null});
     await remove(ref(db,'schedules/'+pendingScheduleId));
     document.getElementById('resultModal').classList.remove('open');
-    pendingScheduleId=null; resultScorerSel={}; resultParticipantSel=new Set();
+    pendingScheduleId=null; resultScorerSel={}; resultParticipantSel=new Set(); resultMvpSel=null;
     document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector('[data-page="matches"]').classList.add('active');
@@ -950,7 +988,7 @@
     if (action==='toggle') {
       const f=document.getElementById('addForm');
       f.classList.toggle('open');
-      if (f.classList.contains('open')) { renderAddScorerChips(); renderAddParticipantChips(); setTimeout(()=>document.getElementById('fOpp').focus(),50); }
+      if (f.classList.contains('open')) { renderAddScorerChips(); renderAddParticipantChips(); renderAddMvpChips(); setTimeout(()=>document.getElementById('fOpp').focus(),50); }
     } else if (action.startsWith('delete:')) {
       delMatch(action.split(':')[1]);
     } else if (action==='schedule') {
@@ -964,12 +1002,13 @@
     } else if (action.startsWith('enterresult:')) {
       const key=action.split(':')[1];
       const s=schedules.find(s=>s._key===key); if(!s) return;
-      pendingScheduleId=key; resultScorerSel={}; resultParticipantSel=new Set();
+      pendingScheduleId=key; resultScorerSel={}; resultParticipantSel=new Set(); resultMvpSel=null;
       document.getElementById('resultModalSub').textContent=`vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
       document.getElementById('rGF').value=''; document.getElementById('rGA').value='';
       document.getElementById('rNote').value=s.place||'';
       buildScorerChips('resultScorerList', resultScorerSel);
       buildParticipantChips('resultParticipantList', resultParticipantSel, 'resultParticipantCount');
+      renderResultMvpChips();
       document.getElementById('resultModal').classList.add('open');
       setTimeout(()=>document.getElementById('rGF').focus(),100);
     } else if (action==='teamname') {
