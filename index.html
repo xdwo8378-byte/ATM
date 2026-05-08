@@ -106,7 +106,32 @@
   .btn-cancel { flex: 1; padding: 10px; border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
   .btn-confirm { flex: 2; padding: 10px; background: var(--green); color: #000; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
 
-  @media (max-width: 400px) {
+  /* SCHEDULE */
+  .schedule-section { padding: 0 1.5rem 1.5rem; }
+  .schedule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
+  .schedule-card.today { border-color: var(--green); }
+  .schedule-card.soon { border-color: var(--yellow); }
+  .countdown-box { text-align: center; min-width: 56px; }
+  .countdown-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; color: var(--green); }
+  .countdown-num.today { color: var(--yellow); }
+  .countdown-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; }
+  .schedule-info { flex: 1; min-width: 0; }
+  .schedule-opp { font-size: 15px; font-weight: 500; }
+  .schedule-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .schedule-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; transition: opacity 0.15s; }
+  .schedule-del:hover { opacity: 1; color: var(--red); }
+  .no-schedule { font-size: 13px; color: var(--muted); padding: 10px 0; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .btn-add-schedule { font-size: 12px; padding: 4px 12px; border-radius: 99px; border: 1px dashed var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .btn-add-schedule:hover { border-color: var(--green); color: var(--green); }
+  .schedule-form { background: var(--surface2); border-radius: 10px; padding: 1rem; margin-bottom: 8px; display: none; }
+  .schedule-form.open { display: block; }
+
+  .schedule-card.past { border-color: var(--muted); opacity: 0.85; }
+  .past-section-title { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin: 12px 0 8px; }
+  .btn-enter-result { font-size: 12px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--green); background: none; color: var(--green); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; transition: all 0.15s; }
+  .btn-enter-result:hover { background: rgba(0,194,124,0.12); }
     .stats-section { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .stat-num { font-size: 2rem; }
   }
@@ -127,7 +152,60 @@
   </div>
 </div>
 
-<!-- TEAM NAME MODAL -->
+<!-- RESULT FROM SCHEDULE MODAL -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal">
+    <div class="modal-title">⚽ 경기 결과 입력</div>
+    <div class="modal-sub" id="resultModalSub">vs 상대팀 결과를 입력해주세요.</div>
+    <div class="score-row" style="margin-bottom:10px">
+      <span class="score-lbl">스코어</span>
+      <div class="score-inputs">
+        <input type="number" id="rGF" placeholder="득" min="0" max="99" />
+        <span class="score-sep">:</span>
+        <input type="number" id="rGA" placeholder="실" min="0" max="99" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <span class="form-label">메모 (선택)</span>
+      <input type="text" id="rNote" placeholder="특이사항 등" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeResultModal()">취소</button>
+      <button class="btn-confirm" onclick="saveResultFromSchedule()">저장</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal">
+    <div class="modal-title">📅 경기 일정 추가</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <span class="form-label">상대 팀</span>
+      <input type="text" id="sOpp" placeholder="상대 팀 이름" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <span class="form-label">날짜</span>
+        <input type="date" id="sDate" />
+      </div>
+      <div class="form-group">
+        <span class="form-label">시간 (선택)</span>
+        <input type="time" id="sTime" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <span class="form-label">장소 (선택)</span>
+      <input type="text" id="sPlace" placeholder="경기장 이름" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeScheduleModal()">취소</button>
+      <button class="btn-confirm" onclick="saveSchedule()">저장</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="nameModal">
   <div class="modal">
     <div class="modal-title">팀 이름 변경</div>
@@ -174,6 +252,15 @@
     <span><span class="bar-dot" style="background:var(--yellow)"></span>무</span>
     <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
   </div>
+</div>
+
+<!-- SCHEDULE SECTION -->
+<div class="schedule-section">
+  <div class="section-header">
+    <span class="section-title">📅 다음 경기</span>
+    <button class="btn-add-schedule" onclick="requestAdmin('schedule')">+ 일정 추가</button>
+  </div>
+  <div id="scheduleList"><div class="no-schedule">등록된 일정이 없어요.</div></div>
 </div>
 
 <div class="add-section">
@@ -355,6 +442,14 @@
     } else if (action.startsWith('delete:')) {
       const id = parseInt(action.split(':')[1]);
       delMatch(id);
+    } else if (action.startsWith('enterresult:')) {
+      const id = parseInt(action.split(':')[1]);
+      openResultModal(id);
+    } else if (action === 'schedule') {
+      openScheduleModal();
+    } else if (action.startsWith('delschedule:')) {
+      const id = parseInt(action.split(':')[1]);
+      delSchedule(id);
     } else if (action === 'teamname') {
       document.getElementById('nameInput').value = teamName;
       document.getElementById('nameModal').classList.add('open');
@@ -384,6 +479,136 @@
   }
   document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveTeamName(); });
 
+  const SCHED_KEY = 'futsal_v2_schedules';
+  let schedules = JSON.parse(localStorage.getItem(SCHED_KEY) || '[]');
+
+  function saveSchedules() { localStorage.setItem(SCHED_KEY, JSON.stringify(schedules)); }
+
+  function renderSchedules() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = schedules
+      .filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d >= today; })
+      .sort((a,b) => new Date(a.date) - new Date(b.date));
+    const past = schedules
+      .filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d < today; })
+      .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    const el = document.getElementById('scheduleList');
+    let html = '';
+
+    if (upcoming.length === 0 && past.length === 0) {
+      el.innerHTML = '<div class="no-schedule">등록된 일정이 없어요.</div>';
+      return;
+    }
+
+    if (upcoming.length === 0) {
+      html += '<div class="no-schedule">예정된 경기가 없어요.</div>';
+    } else {
+      html += upcoming.map(s => {
+        const d = new Date(s.date); d.setHours(0,0,0,0);
+        const diff = Math.round((d - today) / (1000*60*60*24));
+        const isToday = diff === 0;
+        const cardCls = isToday ? 'today' : diff <= 3 ? 'soon' : '';
+        const numCls = isToday ? 'today' : '';
+        const label = isToday ? '오늘!' : diff === 1 ? '내일' : 'D-' + diff;
+        const dateStr = s.date.replace(/-/g, '.');
+        const meta = [dateStr, s.time, s.place].filter(Boolean).join(' · ');
+        return `<div class="schedule-card ${cardCls}">
+          <div class="countdown-box">
+            <div class="countdown-num ${numCls}">${label}</div>
+            <div class="countdown-lbl">${isToday ? 'TODAY' : diff + 'days'}</div>
+          </div>
+          <div class="schedule-info">
+            <div class="schedule-opp">vs ${s.opp}</div>
+            <div class="schedule-meta">${meta}</div>
+          </div>
+          <button class="schedule-del" onclick="requestAdmin('delschedule:${s.id}')" title="삭제">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    if (past.length > 0) {
+      html += `<div class="past-section-title">⏰ 결과 미입력</div>`;
+      html += past.map(s => {
+        const dateStr = s.date.replace(/-/g, '.');
+        const meta = [dateStr, s.time, s.place].filter(Boolean).join(' · ');
+        return `<div class="schedule-card past">
+          <div class="countdown-box">
+            <div class="countdown-num" style="color:var(--muted);font-size:1.1rem">종료</div>
+            <div class="countdown-lbl">ENDED</div>
+          </div>
+          <div class="schedule-info">
+            <div class="schedule-opp">vs ${s.opp}</div>
+            <div class="schedule-meta">${meta}</div>
+          </div>
+          <button class="btn-enter-result" onclick="requestAdmin('enterresult:${s.id}')">결과 입력</button>
+        </div>`;
+      }).join('');
+    }
+
+    el.innerHTML = html;
+  }
+
+  function openScheduleModal() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('sDate').value = today;
+    document.getElementById('sOpp').value = '';
+    document.getElementById('sTime').value = '';
+    document.getElementById('sPlace').value = '';
+    document.getElementById('scheduleModal').classList.add('open');
+    setTimeout(() => document.getElementById('sOpp').focus(), 100);
+  }
+  function closeScheduleModal() { document.getElementById('scheduleModal').classList.remove('open'); }
+  function saveSchedule() {
+    const opp = document.getElementById('sOpp').value.trim();
+    const date = document.getElementById('sDate').value;
+    const time = document.getElementById('sTime').value;
+    const place = document.getElementById('sPlace').value.trim();
+    if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
+    if (!date) { alert('날짜를 입력해주세요.'); return; }
+    schedules.push({ id: Date.now(), opp, date, time, place });
+    saveSchedules(); renderSchedules(); closeScheduleModal();
+  }
+  function delSchedule(id) {
+    if (!confirm('이 일정을 삭제할까요?')) return;
+    schedules = schedules.filter(s => s.id !== id);
+    saveSchedules(); renderSchedules();
+  }
+
+  let pendingScheduleId = null;
+
+  function openResultModal(scheduleId) {
+    const s = schedules.find(s => s.id === scheduleId);
+    if (!s) return;
+    pendingScheduleId = scheduleId;
+    document.getElementById('resultModalSub').textContent = `vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
+    document.getElementById('rGF').value = '';
+    document.getElementById('rGA').value = '';
+    document.getElementById('rNote').value = s.place || '';
+    document.getElementById('resultModal').classList.add('open');
+    setTimeout(() => document.getElementById('rGF').focus(), 100);
+  }
+  function closeResultModal() {
+    document.getElementById('resultModal').classList.remove('open');
+    pendingScheduleId = null;
+  }
+  function saveResultFromSchedule() {
+    const gf = parseInt(document.getElementById('rGF').value);
+    const ga = parseInt(document.getElementById('rGA').value);
+    const note = document.getElementById('rNote').value.trim();
+    if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
+    const s = schedules.find(s => s.id === pendingScheduleId);
+    if (!s) return;
+    matches.unshift({ id: Date.now(), opp: s.opp, date: s.date, gf, ga, note, r: result(gf, ga) });
+    schedules = schedules.filter(s => s.id !== pendingScheduleId);
+    save(); saveSchedules();
+    closeResultModal();
+    setFilter('all', document.querySelector('.tab'));
+    render(); renderSchedules();
+    document.getElementById('matchList').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  renderSchedules();
   render();
 </script>
 </body>
