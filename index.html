@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>풋살 팀 기록</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00C27C;
+    --green-dark: #009960;
+    --red: #FF4444;
+    --yellow: #FFB800;
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --muted: #666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+
+  /* HEADER */
+  header { padding: 2rem 1.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+  .team-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 8vw, 3.5rem); letter-spacing: 2px; color: var(--green); line-height: 1; cursor: pointer; }
+  .team-subtitle { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .streak-tag { font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 99px; white-space: nowrap; }
+  .streak-win { background: rgba(0,194,124,0.15); color: var(--green); border: 1px solid rgba(0,194,124,0.3); }
+  .streak-lose { background: rgba(255,68,68,0.12); color: var(--red); border: 1px solid rgba(255,68,68,0.25); }
+  .streak-draw { background: rgba(255,184,0,0.12); color: var(--yellow); border: 1px solid rgba(255,184,0,0.25); }
+  .streak-none { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+  /* STATS */
+  .stats-section { padding: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 12px; text-align: center; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1; }
+  .stat-num.g { color: var(--green); }
+  .stat-num.r { color: var(--red); }
+  .stat-num.y { color: var(--yellow); }
+  .stat-num.w { color: var(--text); }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+  /* WIN RATE BAR */
+  .bar-section { padding: 0 1.5rem 1.5rem; }
+  .bar-track { background: var(--surface); border-radius: 99px; height: 8px; overflow: hidden; display: flex; }
+  .bar-seg { height: 100%; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+  .bs-win { background: var(--green); }
+  .bs-draw { background: var(--yellow); }
+  .bs-lose { background: var(--red); }
+  .bar-labels { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .bar-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 6px; padding: 0 1.5rem 1rem; }
+  .tab { font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .tab.active, .tab:hover { color: var(--text); border-color: #444; background: var(--surface2); }
+  .tab.active { color: var(--green); border-color: rgba(0,194,124,0.4); }
+
+  /* MATCH LIST */
+  .match-list { padding: 0 1.5rem; display: flex; flex-direction: column; gap: 8px; padding-bottom: 2rem; }
+  .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: border-color 0.15s; }
+  .match-card:hover { border-color: #333; }
+  .match-card.win { border-left: 3px solid var(--green); }
+  .match-card.lose { border-left: 3px solid var(--red); }
+  .match-card.draw { border-left: 3px solid var(--yellow); }
+  .result-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; width: 32px; text-align: center; }
+  .rb-win { color: var(--green); }
+  .rb-lose { color: var(--red); }
+  .rb-draw { color: var(--yellow); }
+  .match-info { flex: 1; min-width: 0; }
+  .match-opp { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .match-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .match-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 1px; min-width: 60px; text-align: right; }
+  .del-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; transition: opacity 0.15s; }
+  .del-btn:hover { opacity: 1; color: var(--red); }
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+  /* ADD FORM */
+  .add-section { padding: 0 1.5rem 1.5rem; }
+  .add-toggle { width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border); background: none; color: var(--muted); font-size: 14px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; margin-bottom: 10px; }
+  .add-toggle:hover { border-color: var(--green); color: var(--green); }
+  .add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: none; }
+  .add-form.open { display: block; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 9px 12px; width: 100%; font-family: 'Noto Sans KR', sans-serif; transition: border-color 0.15s; }
+  input:focus { outline: none; border-color: var(--green); }
+  input::placeholder { color: var(--muted); }
+  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .score-lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; min-width: 50px; }
+  .score-inputs { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .score-sep { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--muted); }
+  .score-inputs input { width: 70px; text-align: center; }
+  .btn-save { width: 100%; padding: 11px; background: var(--green); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; margin-top: 4px; }
+  .btn-save:hover { background: var(--green-dark); }
+
+  /* PASSWORD MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 90%; max-width: 340px; }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.2rem; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 8px; margin-top: 1rem; }
+  .btn-cancel { flex: 1; padding: 10px; border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+  .btn-confirm { flex: 2; padding: 10px; background: var(--green); color: #000; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+
+  @media (max-width: 400px) {
+    .stats-section { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .stat-num { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal">
+    <div class="modal-title">🔒 관리자 확인</div>
+    <div class="modal-sub">경기를 추가/삭제하려면 관리자 비밀번호가 필요해요.</div>
+    <input type="password" id="pwInput" placeholder="비밀번호 입력" style="margin-bottom:0" />
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">취소</button>
+      <button class="btn-confirm" onclick="checkPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM NAME MODAL -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal">
+    <div class="modal-title">팀 이름 변경</div>
+    <input type="text" id="nameInput" placeholder="새 팀 이름" style="margin-bottom:0" />
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeNameModal()">취소</button>
+      <button class="btn-confirm" onclick="saveTeamName()">저장</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <div class="team-title" id="teamTitle" onclick="openNameModal()" title="클릭해서 팀 이름 변경">FC TEAM</div>
+    <div class="team-subtitle">클릭해서 팀 이름 변경</div>
+  </div>
+  <span class="streak-tag streak-none" id="streakTag">기록 없음</span>
+</header>
+
+<div class="stats-section">
+  <div class="stat-box"><div class="stat-num w" id="sTotal">0</div><div class="stat-lbl">총 경기</div></div>
+  <div class="stat-box"><div class="stat-num g" id="sWin">0</div><div class="stat-lbl">승</div></div>
+  <div class="stat-box"><div class="stat-num" id="sWinRate" style="color:var(--text)">-</div><div class="stat-lbl">승률</div></div>
+  <div class="stat-box"><div class="stat-num y" id="sDraw">0</div><div class="stat-lbl">무</div></div>
+  <div class="stat-box"><div class="stat-num r" id="sLose">0</div><div class="stat-lbl">패</div></div>
+  <div class="stat-box">
+    <div class="stat-num" style="font-size:1.4rem; display:flex; align-items:center; justify-content:center; gap:4px; padding-top:4px;">
+      <span style="color:var(--green)" id="sGF">0</span>
+      <span style="color:var(--muted); font-size:1rem">:</span>
+      <span style="color:var(--red)" id="sGA">0</span>
+    </div>
+    <div class="stat-lbl">득점:실점</div>
+  </div>
+</div>
+
+<div class="bar-section">
+  <div class="bar-track">
+    <div class="bar-seg bs-win" id="barWin" style="width:0%"></div>
+    <div class="bar-seg bs-draw" id="barDraw" style="width:0%"></div>
+    <div class="bar-seg bs-lose" id="barLose" style="width:0%"></div>
+  </div>
+  <div class="bar-labels">
+    <span><span class="bar-dot" style="background:var(--green)"></span>승</span>
+    <span><span class="bar-dot" style="background:var(--yellow)"></span>무</span>
+    <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
+  </div>
+</div>
+
+<div class="add-section">
+  <button class="add-toggle" id="addToggle" onclick="requestAdmin('toggle')">+ 경기 결과 추가</button>
+  <div class="add-form" id="addForm">
+    <div class="form-row">
+      <div class="form-group">
+        <span class="form-label">상대 팀</span>
+        <input type="text" id="fOpp" placeholder="상대 팀 이름" />
+      </div>
+      <div class="form-group">
+        <span class="form-label">날짜</span>
+        <input type="date" id="fDate" />
+      </div>
+    </div>
+    <div class="score-row">
+      <span class="score-lbl">스코어</span>
+      <div class="score-inputs">
+        <input type="number" id="fGF" placeholder="득" min="0" max="99" />
+        <span class="score-sep">:</span>
+        <input type="number" id="fGA" placeholder="실" min="0" max="99" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <span class="form-label">메모 (선택)</span>
+      <input type="text" id="fNote" placeholder="장소, 특이사항 등" />
+    </div>
+    <button class="btn-save" onclick="addMatch()">저장</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setFilter('all',this)">전체</button>
+  <button class="tab" onclick="setFilter('win',this)">승</button>
+  <button class="tab" onclick="setFilter('draw',this)">무</button>
+  <button class="tab" onclick="setFilter('lose',this)">패</button>
+</div>
+
+<div class="match-list" id="matchList"></div>
+
+<script>
+  const ADMIN_PW = 'goal';
+  const MATCHES_KEY = 'futsal_v2_matches';
+  const TEAM_KEY = 'futsal_v2_team';
+
+  let matches = JSON.parse(localStorage.getItem(MATCHES_KEY) || '[]');
+  let teamName = localStorage.getItem(TEAM_KEY) || 'FC TEAM';
+  let filter = 'all';
+  let adminUnlocked = false;
+  let pendingAction = null;
+
+  document.getElementById('teamTitle').textContent = teamName;
+  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+
+  function save() { localStorage.setItem(MATCHES_KEY, JSON.stringify(matches)); }
+
+  function result(gf, ga) { return gf > ga ? 'win' : gf < ga ? 'lose' : 'draw'; }
+
+  function render() {
+    const total = matches.length;
+    const wins = matches.filter(m => m.r === 'win').length;
+    const draws = matches.filter(m => m.r === 'draw').length;
+    const loses = matches.filter(m => m.r === 'lose').length;
+    const gf = matches.reduce((s,m) => s+m.gf, 0);
+    const ga = matches.reduce((s,m) => s+m.ga, 0);
+
+    document.getElementById('sTotal').textContent = total;
+    document.getElementById('sWin').textContent = wins;
+    document.getElementById('sDraw').textContent = draws;
+    document.getElementById('sLose').textContent = loses;
+    document.getElementById('sGF').textContent = gf;
+    document.getElementById('sGA').textContent = ga;
+    document.getElementById('sWinRate').textContent = total > 0 ? Math.round(wins/total*100) + '%' : '-';
+
+    if (total > 0) {
+      document.getElementById('barWin').style.width = Math.round(wins/total*100) + '%';
+      document.getElementById('barDraw').style.width = Math.round(draws/total*100) + '%';
+      document.getElementById('barLose').style.width = Math.round(loses/total*100) + '%';
+    } else {
+      ['barWin','barDraw','barLose'].forEach(id => document.getElementById(id).style.width = '0%');
+    }
+
+    // streak
+    const tag = document.getElementById('streakTag');
+    if (total === 0) {
+      tag.textContent = '기록 없음'; tag.className = 'streak-tag streak-none';
+    } else {
+      let cnt = 1, last = matches[0].r;
+      for (let i = 1; i < matches.length; i++) {
+        if (matches[i].r === last) cnt++; else break;
+      }
+      const labels = {win:'연승',lose:'연패',draw:'연무'};
+      const cls = {win:'streak-win',lose:'streak-lose',draw:'streak-draw'};
+      tag.textContent = cnt + ' ' + labels[last]; tag.className = 'streak-tag ' + cls[last];
+    }
+
+    renderList();
+  }
+
+  function renderList() {
+    const filtered = filter === 'all' ? matches : matches.filter(m => m.r === filter);
+    const el = document.getElementById('matchList');
+    if (filtered.length === 0) {
+      el.innerHTML = '<div class="empty">아직 경기 기록이 없어요.<br>첫 번째 경기를 추가해보세요! ⚽</div>';
+      return;
+    }
+    const rlabel = {win:'W', lose:'L', draw:'D'};
+    const rcls = {win:'rb-win', lose:'rb-lose', draw:'rb-draw'};
+    el.innerHTML = filtered.map(m => {
+      const d = m.date ? m.date.replace(/-/g, '.') : '';
+      const diff = m.gf - m.ga;
+      const diffStr = diff > 0 ? '+'+diff : diff;
+      return `<div class="match-card ${m.r}">
+        <span class="result-badge ${rcls[m.r]}">${rlabel[m.r]}</span>
+        <div class="match-info">
+          <div class="match-opp">vs ${m.opp}</div>
+          <div class="match-meta">${d}${m.note ? ' · ' + m.note : ''} &nbsp;(${diffStr})</div>
+        </div>
+        <div class="match-score">${m.gf}:${m.ga}</div>
+        <button class="del-btn" onclick="requestAdmin('delete:${m.id}')" title="삭제">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function addMatch() {
+    const opp = document.getElementById('fOpp').value.trim();
+    const date = document.getElementById('fDate').value;
+    const gf = parseInt(document.getElementById('fGF').value);
+    const ga = parseInt(document.getElementById('fGA').value);
+    const note = document.getElementById('fNote').value.trim();
+    if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
+    if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
+    matches.unshift({ id: Date.now(), opp, date, gf, ga, note, r: result(gf, ga) });
+    save(); render();
+    document.getElementById('fOpp').value = '';
+    document.getElementById('fGF').value = '';
+    document.getElementById('fGA').value = '';
+    document.getElementById('fNote').value = '';
+  }
+
+  function delMatch(id) {
+    if (!confirm('이 경기 기록을 삭제할까요?')) return;
+    matches = matches.filter(m => m.id !== id);
+    save(); render();
+  }
+
+  function setFilter(f, btn) {
+    filter = f;
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  // ADMIN
+  function requestAdmin(action) {
+    if (adminUnlocked) { executeAction(action); return; }
+    pendingAction = action;
+    document.getElementById('pwModal').classList.add('open');
+    setTimeout(() => document.getElementById('pwInput').focus(), 100);
+  }
+
+  function checkPw() {
+    const pw = document.getElementById('pwInput').value;
+    if (pw === ADMIN_PW) {
+      adminUnlocked = true;
+      closeModal();
+      if (pendingAction) { executeAction(pendingAction); pendingAction = null; }
+    } else {
+      alert('비밀번호가 틀렸어요.');
+      document.getElementById('pwInput').value = '';
+    }
+  }
+
+  function executeAction(action) {
+    if (action === 'toggle') {
+      const f = document.getElementById('addForm');
+      f.classList.toggle('open');
+      if (f.classList.contains('open')) setTimeout(() => document.getElementById('fOpp').focus(), 50);
+    } else if (action.startsWith('delete:')) {
+      const id = parseInt(action.split(':')[1]);
+      delMatch(id);
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('pwModal').classList.remove('open');
+    document.getElementById('pwInput').value = '';
+  }
+
+  document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+
+  // TEAM NAME
+  function openNameModal() {
+    document.getElementById('nameInput').value = teamName;
+    document.getElementById('nameModal').classList.add('open');
+    setTimeout(() => document.getElementById('nameInput').focus(), 100);
+  }
+  function closeNameModal() { document.getElementById('nameModal').classList.remove('open'); }
+  function saveTeamName() {
+    const n = document.getElementById('nameInput').value.trim();
+    if (n) { teamName = n; localStorage.setItem(TEAM_KEY, n); document.getElementById('teamTitle').textContent = n; }
+    closeNameModal();
+  }
+  document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveTeamName(); });
+
+  render();
+</script>
+</body>
+</html>
