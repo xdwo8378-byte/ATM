@@ -362,13 +362,12 @@
       <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
     </div>
   </div>
-  <!-- TOP SCORERS PREVIEW -->
+  <!-- MVP RANKING -->
   <div style="padding:0 1.5rem 1.5rem;">
     <div class="section-header">
-      <span class="section-title">🏆 득점 순위</span>
-      <button class="btn-add-schedule" id="btnGoToPlayers">전체 보기</button>
+      <span class="section-title">🌟 MVP 순위</span>
     </div>
-    <div id="topScorersPreview"><div class="no-schedule">경기 기록이 없어요.</div></div>
+    <div id="mvpRankingPreview"><div class="no-schedule">MVP 기록이 없어요.</div></div>
   </div>
 </div>
 
@@ -494,7 +493,7 @@
   onValue(ref(db, 'matches'), s => {
     const d = s.val();
     matches = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})).sort((a,b) => b.id-a.id) : [];
-    renderStats(); renderMatchList(); renderTopScorers(); renderPlayerList();
+    renderStats(); renderMatchList(); renderTopScorers(); renderMvpRanking(); renderPlayerList();
   });
   onValue(ref(db, 'schedules'), s => {
     const d = s.val();
@@ -504,7 +503,7 @@
   onValue(ref(db, 'players'), s => {
     const d = s.val();
     players = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})) : [];
-    renderPlayerList(); renderAddScorerChips(); renderTopScorers();
+    renderPlayerList(); renderAddScorerChips(); renderTopScorers(); renderMvpRanking();
   });
 
   onValue(ref(db, 'teamPhoto'), s => { renderTeamPhoto(s.val()); });
@@ -583,13 +582,6 @@
       document.getElementById('page-' + btn.dataset.page).classList.add('active');
     });
   });
-  document.getElementById('btnGoToPlayers').addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelector('[data-page="players"]').classList.add('active');
-    document.getElementById('page-players').classList.add('active');
-  });
-
   // ── Stats ──
   function result(gf, ga) { return gf > ga ? 'win' : gf < ga ? 'lose' : 'draw'; }
 
@@ -630,6 +622,15 @@
     return tally;
   }
 
+  function getMvpTally() {
+    const tally = {};
+    matches.forEach(m => {
+      if (!m.mvp) return;
+      tally[m.mvp] = (tally[m.mvp]||0) + 1;
+    });
+    return tally;
+  }
+
   function renderTopScorers() {
     const tally = getGoalTally();
     const sorted = players.map(p => ({...p, goals: tally[p._key]||0})).filter(p => p.goals > 0).sort((a,b) => b.goals-a.goals).slice(0,5);
@@ -641,6 +642,20 @@
         <div class="player-avatar">${p.name.charAt(0)}</div>
         <div class="player-info"><div class="player-name">${p.name}</div></div>
         <div style="text-align:center"><div class="player-goals">${p.goals}</div><div class="player-goals-lbl">골</div></div>
+      </div>`).join('');
+  }
+
+  function renderMvpRanking() {
+    const tally = getMvpTally();
+    const sorted = players.map(p => ({...p, mvpCount: tally[p._key]||0})).filter(p => p.mvpCount > 0).sort((a,b) => b.mvpCount-a.mvpCount).slice(0,5);
+    const el = document.getElementById('mvpRankingPreview');
+    if (!sorted.length) { el.innerHTML = '<div class="no-schedule">MVP 기록이 없어요.</div>'; return; }
+    el.innerHTML = sorted.map((p,i) => `
+      <div class="player-card" style="margin-bottom:6px;">
+        <div class="player-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+        <div class="player-avatar" style="border-color:rgba(255,184,0,0.4)">${p.name.charAt(0)}</div>
+        <div class="player-info"><div class="player-name">${p.name}</div><div class="player-stats" style="color:var(--yellow)">🌟 ${p.mvpCount}회 선정</div></div>
+        <div style="text-align:center"><div class="player-goals" style="color:var(--yellow)">${p.mvpCount}</div><div class="player-goals-lbl">회</div></div>
       </div>`).join('');
   }
 
@@ -865,7 +880,8 @@
 
   function renderPlayerList() {
     const tally = getGoalTally();
-    const sorted = players.map(p => ({...p, goals:tally[p._key]||0})).sort((a,b) => b.goals-a.goals);
+    const mvpTally = getMvpTally();
+    const sorted = players.map(p => ({...p, goals:tally[p._key]||0, mvpCount:mvpTally[p._key]||0})).sort((a,b) => b.goals-a.goals);
     const el = document.getElementById('playerList');
     if (!sorted.length) { el.innerHTML='<div class="empty">등록된 팀원이 없어요.<br>팀원 추가 버튼을 눌러주세요!</div>'; return; }
     el.innerHTML = sorted.map((p,i) => `
@@ -874,7 +890,9 @@
         <div class="player-avatar">${p.name.charAt(0)}</div>
         <div class="player-info">
           <div class="player-name">${p.name}</div>
-          <div class="player-stats">${p.goals > 0 ? p.goals+'골' : '득점 없음'}</div>
+          <div class="player-stats">
+            ⚽ ${p.goals}골${p.mvpCount > 0 ? ` &nbsp;🌟 MVP ${p.mvpCount}회` : ''}
+          </div>
         </div>
         <div style="text-align:center;min-width:40px">
           <div class="player-goals">${p.goals}</div>
