@@ -355,6 +355,10 @@
     } else if (action.startsWith('delete:')) {
       const id = parseInt(action.split(':')[1]);
       delMatch(id);
+    } else if (action === 'teamname') {
+      document.getElementById('nameInput').value = teamName;
+      document.getElementById('nameModal').classList.add('open');
+      setTimeout(() => document.getElementById('nameInput').focus(), 100);
     }
   }
 
@@ -367,6 +371,7 @@
 
   // TEAM NAME
   function openNameModal() {
+    if (!adminUnlocked) { requestAdmin('teamname'); return; }
     document.getElementById('nameInput').value = teamName;
     document.getElementById('nameModal').classList.add('open');
     setTimeout(() => document.getElementById('nameInput').focus(), 100);
