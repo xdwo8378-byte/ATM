@@ -249,13 +249,13 @@
 <div class="schedule-section">
   <div class="section-header">
     <span class="section-title">📅 다음 경기</span>
-    <button class="btn-add-schedule" onclick="requestAdmin('schedule')">+ 일정 추가</button>
+    <button class="btn-add-schedule" id="btnAddSchedule">+ 일정 추가</button>
   </div>
   <div id="scheduleList"><div class="loading">불러오는 중...</div></div>
 </div>
 
 <div class="add-section">
-  <button class="add-toggle" onclick="requestAdmin('toggle')">+ 경기 결과 추가</button>
+  <button class="add-toggle" id="btnAddMatch">+ 경기 결과 추가</button>
   <div class="add-form" id="addForm">
     <div class="form-row">
       <div class="form-group">
@@ -480,6 +480,7 @@
     setTimeout(() => document.getElementById('pwInput').focus(), 100);
   }
   window._requestAdmin = requestAdmin;
+  window.requestAdmin = requestAdmin;
 
   function checkPw() {
     const pw = document.getElementById('pwInput').value;
@@ -607,6 +608,10 @@
     }
   }
   window.shareKakao = shareKakao;
+
+  // 버튼 이벤트 직접 바인딩
+  document.getElementById('btnAddSchedule').addEventListener('click', () => requestAdmin('schedule'));
+  document.getElementById('btnAddMatch').addEventListener('click', () => requestAdmin('toggle'));
 </script>
 </body>
 </html>
