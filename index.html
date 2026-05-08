@@ -21,8 +21,6 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
-
-  /* HEADER */
   header { padding: 2rem 1.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
   .team-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 8vw, 3.5rem); letter-spacing: 2px; color: var(--green); line-height: 1; cursor: pointer; }
   .team-subtitle { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -31,8 +29,8 @@
   .streak-lose { background: rgba(255,68,68,0.12); color: var(--red); border: 1px solid rgba(255,68,68,0.25); }
   .streak-draw { background: rgba(255,184,0,0.12); color: var(--yellow); border: 1px solid rgba(255,184,0,0.25); }
   .streak-none { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-
-  /* STATS */
+  .btn-kakao { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 99px; border: none; background: #FEE500; color: #3A1D1D; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; white-space: nowrap; }
+  .btn-kakao:hover { background: #f0d800; }
   .stats-section { padding: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 12px; text-align: center; }
   .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; line-height: 1; }
@@ -41,8 +39,6 @@
   .stat-num.y { color: var(--yellow); }
   .stat-num.w { color: var(--text); }
   .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
-
-  /* WIN RATE BAR */
   .bar-section { padding: 0 1.5rem 1.5rem; }
   .bar-track { background: var(--surface); border-radius: 99px; height: 8px; overflow: hidden; display: flex; }
   .bar-seg { height: 100%; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
@@ -51,14 +47,10 @@
   .bs-lose { background: var(--red); }
   .bar-labels { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--muted); }
   .bar-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
-
-  /* TABS */
   .tabs { display: flex; gap: 6px; padding: 0 1.5rem 1rem; }
   .tab { font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
   .tab.active, .tab:hover { color: var(--text); border-color: #444; background: var(--surface2); }
   .tab.active { color: var(--green); border-color: rgba(0,194,124,0.4); }
-
-  /* MATCH LIST */
   .match-list { padding: 0 1.5rem; display: flex; flex-direction: column; gap: 8px; padding-bottom: 2rem; }
   .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: border-color 0.15s; }
   .match-card:hover { border-color: #333; }
@@ -76,8 +68,6 @@
   .del-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.4; transition: opacity 0.15s; }
   .del-btn:hover { opacity: 1; color: var(--red); }
   .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; line-height: 1.8; }
-
-  /* ADD FORM */
   .add-section { padding: 0 1.5rem 1.5rem; }
   .add-toggle { width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border); background: none; color: var(--muted); font-size: 14px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; margin-bottom: 10px; }
   .add-toggle:hover { border-color: var(--green); color: var(--green); }
@@ -96,8 +86,6 @@
   .score-inputs input { width: 70px; text-align: center; }
   .btn-save { width: 100%; padding: 11px; background: var(--green); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; margin-top: 4px; }
   .btn-save:hover { background: var(--green-dark); }
-
-  /* PASSWORD MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 90%; max-width: 340px; }
@@ -106,12 +94,11 @@
   .modal-btns { display: flex; gap: 8px; margin-top: 1rem; }
   .btn-cancel { flex: 1; padding: 10px; border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
   .btn-confirm { flex: 2; padding: 10px; background: var(--green); color: #000; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
-
-  /* SCHEDULE */
   .schedule-section { padding: 0 1.5rem 1.5rem; }
   .schedule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
   .schedule-card.today { border-color: var(--green); }
   .schedule-card.soon { border-color: var(--yellow); }
+  .schedule-card.past { border-color: var(--muted); opacity: 0.85; }
   .countdown-box { text-align: center; min-width: 56px; }
   .countdown-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; color: var(--green); }
   .countdown-num.today { color: var(--yellow); }
@@ -126,15 +113,11 @@
   .section-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
   .btn-add-schedule { font-size: 12px; padding: 4px 12px; border-radius: 99px; border: 1px dashed var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
   .btn-add-schedule:hover { border-color: var(--green); color: var(--green); }
-  .schedule-form { background: var(--surface2); border-radius: 10px; padding: 1rem; margin-bottom: 8px; display: none; }
-  .schedule-form.open { display: block; }
-
-  .btn-kakao { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 99px; border: none; background: #FEE500; color: #3A1D1D; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; white-space: nowrap; }
-  .btn-kakao:hover { background: #f0d800; }
-  .kakao-icon { width: 18px; height: 18px; }
   .past-section-title { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin: 12px 0 8px; }
   .btn-enter-result { font-size: 12px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--green); background: none; color: var(--green); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; transition: all 0.15s; }
   .btn-enter-result:hover { background: rgba(0,194,124,0.12); }
+  .loading { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 14px; }
+  @media (max-width: 400px) {
     .stats-section { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .stat-num { font-size: 2rem; }
   }
@@ -146,7 +129,7 @@
 <div class="modal-overlay" id="pwModal">
   <div class="modal">
     <div class="modal-title">🔒 관리자 확인</div>
-    <div class="modal-sub">경기를 추가/삭제하려면 관리자 비밀번호가 필요해요.</div>
+    <div class="modal-sub">관리자 비밀번호를 입력해주세요.</div>
     <input type="password" id="pwInput" placeholder="비밀번호 입력" style="margin-bottom:0" />
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">취소</button>
@@ -155,31 +138,19 @@
   </div>
 </div>
 
-<!-- RESULT FROM SCHEDULE MODAL -->
-<div class="modal-overlay" id="resultModal">
+<!-- TEAM NAME MODAL -->
+<div class="modal-overlay" id="nameModal">
   <div class="modal">
-    <div class="modal-title">⚽ 경기 결과 입력</div>
-    <div class="modal-sub" id="resultModalSub">vs 상대팀 결과를 입력해주세요.</div>
-    <div class="score-row" style="margin-bottom:10px">
-      <span class="score-lbl">스코어</span>
-      <div class="score-inputs">
-        <input type="number" id="rGF" placeholder="득" min="0" max="99" />
-        <span class="score-sep">:</span>
-        <input type="number" id="rGA" placeholder="실" min="0" max="99" />
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:0">
-      <span class="form-label">메모 (선택)</span>
-      <input type="text" id="rNote" placeholder="특이사항 등" />
-    </div>
+    <div class="modal-title">팀 이름 변경</div>
+    <input type="text" id="nameInput" placeholder="새 팀 이름" style="margin-bottom:0" />
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeResultModal()">취소</button>
-      <button class="btn-confirm" onclick="saveResultFromSchedule()">저장</button>
+      <button class="btn-cancel" onclick="closeNameModal()">취소</button>
+      <button class="btn-confirm" onclick="saveTeamName()">저장</button>
     </div>
   </div>
 </div>
 
-
+<!-- SCHEDULE MODAL -->
 <div class="modal-overlay" id="scheduleModal">
   <div class="modal">
     <div class="modal-title">📅 경기 일정 추가</div>
@@ -208,28 +179,38 @@
   </div>
 </div>
 
-
-<div class="modal-overlay" id="nameModal">
+<!-- RESULT FROM SCHEDULE MODAL -->
+<div class="modal-overlay" id="resultModal">
   <div class="modal">
-    <div class="modal-title">팀 이름 변경</div>
-    <input type="text" id="nameInput" placeholder="새 팀 이름" style="margin-bottom:0" />
+    <div class="modal-title">⚽ 경기 결과 입력</div>
+    <div class="modal-sub" id="resultModalSub">결과를 입력해주세요.</div>
+    <div class="score-row" style="margin-bottom:10px">
+      <span class="score-lbl">스코어</span>
+      <div class="score-inputs">
+        <input type="number" id="rGF" placeholder="득" min="0" max="99" />
+        <span class="score-sep">:</span>
+        <input type="number" id="rGA" placeholder="실" min="0" max="99" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <span class="form-label">메모 (선택)</span>
+      <input type="text" id="rNote" placeholder="특이사항 등" />
+    </div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeNameModal()">취소</button>
-      <button class="btn-confirm" onclick="saveTeamName()">저장</button>
+      <button class="btn-cancel" onclick="closeResultModal()">취소</button>
+      <button class="btn-confirm" onclick="saveResultFromSchedule()">저장</button>
     </div>
   </div>
 </div>
 
 <header>
   <div>
-    <div class="team-title" id="teamTitle" onclick="openNameModal()" title="클릭해서 팀 이름 변경">FC TEAM</div>
+    <div class="team-title" id="teamTitle" onclick="openNameModal()">FC TEAM</div>
     <div class="team-subtitle">클릭해서 팀 이름 변경</div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
     <button class="btn-kakao" onclick="shareKakao()">
-      <svg class="kakao-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 1.5C4.86 1.5 1.5 4.19 1.5 7.5c0 2.07 1.22 3.89 3.07 5.01L3.75 15l3.13-1.88c.69.13 1.4.2 2.12.2 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z" fill="#3A1D1D"/>
-      </svg>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C4.86 1.5 1.5 4.19 1.5 7.5c0 2.07 1.22 3.89 3.07 5.01L3.75 15l3.13-1.88c.69.13 1.4.2 2.12.2 4.14 0 7.5-2.69 7.5-6s-3.36-6-7.5-6z" fill="#3A1D1D"/></svg>
       카톡 공유
     </button>
     <span class="streak-tag streak-none" id="streakTag">기록 없음</span>
@@ -243,9 +224,9 @@
   <div class="stat-box"><div class="stat-num y" id="sDraw">0</div><div class="stat-lbl">무</div></div>
   <div class="stat-box"><div class="stat-num r" id="sLose">0</div><div class="stat-lbl">패</div></div>
   <div class="stat-box">
-    <div class="stat-num" style="font-size:1.4rem; display:flex; align-items:center; justify-content:center; gap:4px; padding-top:4px;">
+    <div class="stat-num" style="font-size:1.4rem;display:flex;align-items:center;justify-content:center;gap:4px;padding-top:4px;">
       <span style="color:var(--green)" id="sGF">0</span>
-      <span style="color:var(--muted); font-size:1rem">:</span>
+      <span style="color:var(--muted);font-size:1rem">:</span>
       <span style="color:var(--red)" id="sGA">0</span>
     </div>
     <div class="stat-lbl">득점:실점</div>
@@ -265,17 +246,16 @@
   </div>
 </div>
 
-<!-- SCHEDULE SECTION -->
 <div class="schedule-section">
   <div class="section-header">
     <span class="section-title">📅 다음 경기</span>
     <button class="btn-add-schedule" onclick="requestAdmin('schedule')">+ 일정 추가</button>
   </div>
-  <div id="scheduleList"><div class="no-schedule">등록된 일정이 없어요.</div></div>
+  <div id="scheduleList"><div class="loading">불러오는 중...</div></div>
 </div>
 
 <div class="add-section">
-  <button class="add-toggle" id="addToggle" onclick="requestAdmin('toggle')">+ 경기 결과 추가</button>
+  <button class="add-toggle" onclick="requestAdmin('toggle')">+ 경기 결과 추가</button>
   <div class="add-form" id="addForm">
     <div class="form-row">
       <div class="form-group">
@@ -310,23 +290,53 @@
   <button class="tab" onclick="setFilter('lose',this)">패</button>
 </div>
 
-<div class="match-list" id="matchList"></div>
+<div class="match-list" id="matchList"><div class="loading">불러오는 중...</div></div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2L91xBKBxCakJ_9blufR3MMQPujnJ7bI",
+    authDomain: "futsal-21f39.firebaseapp.com",
+    databaseURL: "https://futsal-21f39-default-rtdb.firebaseio.com",
+    projectId: "futsal-21f39",
+    storageBucket: "futsal-21f39.firebasestorage.app",
+    messagingSenderId: "317258606494",
+    appId: "1:317258606494:web:e89f457a0190105199988f"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
   const ADMIN_PW = 'goal';
-  const MATCHES_KEY = 'futsal_v2_matches';
-  const TEAM_KEY = 'futsal_v2_team';
-
-  let matches = JSON.parse(localStorage.getItem(MATCHES_KEY) || '[]');
-  let teamName = localStorage.getItem(TEAM_KEY) || 'FC TEAM';
+  let matches = [];
+  let schedules = [];
+  let teamName = 'FC TEAM';
   let filter = 'all';
   let adminUnlocked = false;
   let pendingAction = null;
+  let pendingScheduleId = null;
 
-  document.getElementById('teamTitle').textContent = teamName;
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 
-  function save() { localStorage.setItem(MATCHES_KEY, JSON.stringify(matches)); }
+  // Firebase 실시간 구독
+  onValue(ref(db, 'teamName'), snap => {
+    teamName = snap.val() || 'FC TEAM';
+    document.getElementById('teamTitle').textContent = teamName;
+  });
+
+  onValue(ref(db, 'matches'), snap => {
+    const data = snap.val();
+    matches = data ? Object.entries(data).map(([k,v]) => ({...v, _key: k})).sort((a,b) => b.id - a.id) : [];
+    render();
+  });
+
+  onValue(ref(db, 'schedules'), snap => {
+    const data = snap.val();
+    schedules = data ? Object.entries(data).map(([k,v]) => ({...v, _key: k})) : [];
+    renderSchedules();
+  });
 
   function result(gf, ga) { return gf > ga ? 'win' : gf < ga ? 'lose' : 'draw'; }
 
@@ -354,7 +364,6 @@
       ['barWin','barDraw','barLose'].forEach(id => document.getElementById(id).style.width = '0%');
     }
 
-    // streak
     const tag = document.getElementById('streakTag');
     if (total === 0) {
       tag.textContent = '기록 없음'; tag.className = 'streak-tag streak-none';
@@ -391,12 +400,52 @@
           <div class="match-meta">${d}${m.note ? ' · ' + m.note : ''} &nbsp;(${diffStr})</div>
         </div>
         <div class="match-score">${m.gf}:${m.ga}</div>
-        <button class="del-btn" onclick="requestAdmin('delete:${m.id}')" title="삭제">✕</button>
+        <button class="del-btn" onclick="window._requestAdmin('delete:${m._key}')" title="삭제">✕</button>
       </div>`;
     }).join('');
   }
 
-  function addMatch() {
+  function renderSchedules() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = schedules.filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d >= today; }).sort((a,b) => new Date(a.date)-new Date(b.date));
+    const past = schedules.filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d < today; }).sort((a,b) => new Date(b.date)-new Date(a.date));
+    const el = document.getElementById('scheduleList');
+    let html = '';
+    if (upcoming.length === 0 && past.length === 0) { el.innerHTML = '<div class="no-schedule">등록된 일정이 없어요.</div>'; return; }
+    if (upcoming.length === 0) html += '<div class="no-schedule">예정된 경기가 없어요.</div>';
+    else {
+      html += upcoming.map(s => {
+        const d = new Date(s.date); d.setHours(0,0,0,0);
+        const diff = Math.round((d - today) / (1000*60*60*24));
+        const isToday = diff === 0;
+        const cardCls = isToday ? 'today' : diff <= 3 ? 'soon' : '';
+        const label = isToday ? '오늘!' : diff === 1 ? '내일' : 'D-' + diff;
+        const meta = [s.date.replace(/-/g,'.'), s.time, s.place].filter(Boolean).join(' · ');
+        return `<div class="schedule-card ${cardCls}">
+          <div class="countdown-box">
+            <div class="countdown-num ${isToday?'today':''}">${label}</div>
+            <div class="countdown-lbl">${isToday ? 'TODAY' : diff+'days'}</div>
+          </div>
+          <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
+          <button class="schedule-del" onclick="window._requestAdmin('delschedule:${s._key}')">✕</button>
+        </div>`;
+      }).join('');
+    }
+    if (past.length > 0) {
+      html += `<div class="past-section-title">⏰ 결과 미입력</div>`;
+      html += past.map(s => {
+        const meta = [s.date.replace(/-/g,'.'), s.time, s.place].filter(Boolean).join(' · ');
+        return `<div class="schedule-card past">
+          <div class="countdown-box"><div class="countdown-num" style="color:var(--muted);font-size:1.1rem">종료</div><div class="countdown-lbl">ENDED</div></div>
+          <div class="schedule-info"><div class="schedule-opp">vs ${s.opp}</div><div class="schedule-meta">${meta}</div></div>
+          <button class="btn-enter-result" onclick="window._requestAdmin('enterresult:${s._key}')">결과 입력</button>
+        </div>`;
+      }).join('');
+    }
+    el.innerHTML = html;
+  }
+
+  async function addMatch() {
     const opp = document.getElementById('fOpp').value.trim();
     const date = document.getElementById('fDate').value;
     const gf = parseInt(document.getElementById('fGF').value);
@@ -404,18 +453,16 @@
     const note = document.getElementById('fNote').value.trim();
     if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
     if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
-    matches.unshift({ id: Date.now(), opp, date, gf, ga, note, r: result(gf, ga) });
-    save(); render();
+    await push(ref(db, 'matches'), { id: Date.now(), opp, date, gf, ga, note, r: result(gf, ga) });
     document.getElementById('fOpp').value = '';
     document.getElementById('fGF').value = '';
     document.getElementById('fGA').value = '';
     document.getElementById('fNote').value = '';
   }
 
-  function delMatch(id) {
+  async function delMatch(key) {
     if (!confirm('이 경기 기록을 삭제할까요?')) return;
-    matches = matches.filter(m => m.id !== id);
-    save(); render();
+    await remove(ref(db, 'matches/' + key));
   }
 
   function setFilter(f, btn) {
@@ -424,14 +471,15 @@
     btn.classList.add('active');
     renderList();
   }
+  window.setFilter = setFilter;
 
-  // ADMIN
   function requestAdmin(action) {
     if (adminUnlocked) { executeAction(action); return; }
     pendingAction = action;
     document.getElementById('pwModal').classList.add('open');
     setTimeout(() => document.getElementById('pwInput').focus(), 100);
   }
+  window._requestAdmin = requestAdmin;
 
   function checkPw() {
     const pw = document.getElementById('pwInput').value;
@@ -444,6 +492,7 @@
       document.getElementById('pwInput').value = '';
     }
   }
+  window.checkPw = checkPw;
 
   function executeAction(action) {
     if (action === 'toggle') {
@@ -451,16 +500,13 @@
       f.classList.toggle('open');
       if (f.classList.contains('open')) setTimeout(() => document.getElementById('fOpp').focus(), 50);
     } else if (action.startsWith('delete:')) {
-      const id = parseInt(action.split(':')[1]);
-      delMatch(id);
-    } else if (action.startsWith('enterresult:')) {
-      const id = parseInt(action.split(':')[1]);
-      openResultModal(id);
+      delMatch(action.split(':')[1]);
     } else if (action === 'schedule') {
       openScheduleModal();
     } else if (action.startsWith('delschedule:')) {
-      const id = parseInt(action.split(':')[1]);
-      delSchedule(id);
+      delSchedule(action.split(':')[1]);
+    } else if (action.startsWith('enterresult:')) {
+      openResultModal(action.split(':')[1]);
     } else if (action === 'teamname') {
       document.getElementById('nameInput').value = teamName;
       document.getElementById('nameModal').classList.add('open');
@@ -468,101 +514,29 @@
     }
   }
 
-  function closeModal() {
-    document.getElementById('pwModal').classList.remove('open');
-    document.getElementById('pwInput').value = '';
-  }
-
+  function closeModal() { document.getElementById('pwModal').classList.remove('open'); document.getElementById('pwInput').value = ''; }
+  window.closeModal = closeModal;
   document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
 
-  // TEAM NAME
   function openNameModal() {
     if (!adminUnlocked) { requestAdmin('teamname'); return; }
     document.getElementById('nameInput').value = teamName;
     document.getElementById('nameModal').classList.add('open');
     setTimeout(() => document.getElementById('nameInput').focus(), 100);
   }
+  window.openNameModal = openNameModal;
   function closeNameModal() { document.getElementById('nameModal').classList.remove('open'); }
-  function saveTeamName() {
+  window.closeNameModal = closeNameModal;
+  async function saveTeamName() {
     const n = document.getElementById('nameInput').value.trim();
-    if (n) { teamName = n; localStorage.setItem(TEAM_KEY, n); document.getElementById('teamTitle').textContent = n; }
+    if (n) await set(ref(db, 'teamName'), n);
     closeNameModal();
   }
+  window.saveTeamName = saveTeamName;
   document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveTeamName(); });
 
-  const SCHED_KEY = 'futsal_v2_schedules';
-  let schedules = JSON.parse(localStorage.getItem(SCHED_KEY) || '[]');
-
-  function saveSchedules() { localStorage.setItem(SCHED_KEY, JSON.stringify(schedules)); }
-
-  function renderSchedules() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const upcoming = schedules
-      .filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d >= today; })
-      .sort((a,b) => new Date(a.date) - new Date(b.date));
-    const past = schedules
-      .filter(s => { const d = new Date(s.date); d.setHours(0,0,0,0); return d < today; })
-      .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    const el = document.getElementById('scheduleList');
-    let html = '';
-
-    if (upcoming.length === 0 && past.length === 0) {
-      el.innerHTML = '<div class="no-schedule">등록된 일정이 없어요.</div>';
-      return;
-    }
-
-    if (upcoming.length === 0) {
-      html += '<div class="no-schedule">예정된 경기가 없어요.</div>';
-    } else {
-      html += upcoming.map(s => {
-        const d = new Date(s.date); d.setHours(0,0,0,0);
-        const diff = Math.round((d - today) / (1000*60*60*24));
-        const isToday = diff === 0;
-        const cardCls = isToday ? 'today' : diff <= 3 ? 'soon' : '';
-        const numCls = isToday ? 'today' : '';
-        const label = isToday ? '오늘!' : diff === 1 ? '내일' : 'D-' + diff;
-        const dateStr = s.date.replace(/-/g, '.');
-        const meta = [dateStr, s.time, s.place].filter(Boolean).join(' · ');
-        return `<div class="schedule-card ${cardCls}">
-          <div class="countdown-box">
-            <div class="countdown-num ${numCls}">${label}</div>
-            <div class="countdown-lbl">${isToday ? 'TODAY' : diff + 'days'}</div>
-          </div>
-          <div class="schedule-info">
-            <div class="schedule-opp">vs ${s.opp}</div>
-            <div class="schedule-meta">${meta}</div>
-          </div>
-          <button class="schedule-del" onclick="requestAdmin('delschedule:${s.id}')" title="삭제">✕</button>
-        </div>`;
-      }).join('');
-    }
-
-    if (past.length > 0) {
-      html += `<div class="past-section-title">⏰ 결과 미입력</div>`;
-      html += past.map(s => {
-        const dateStr = s.date.replace(/-/g, '.');
-        const meta = [dateStr, s.time, s.place].filter(Boolean).join(' · ');
-        return `<div class="schedule-card past">
-          <div class="countdown-box">
-            <div class="countdown-num" style="color:var(--muted);font-size:1.1rem">종료</div>
-            <div class="countdown-lbl">ENDED</div>
-          </div>
-          <div class="schedule-info">
-            <div class="schedule-opp">vs ${s.opp}</div>
-            <div class="schedule-meta">${meta}</div>
-          </div>
-          <button class="btn-enter-result" onclick="requestAdmin('enterresult:${s.id}')">결과 입력</button>
-        </div>`;
-      }).join('');
-    }
-
-    el.innerHTML = html;
-  }
-
   function openScheduleModal() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('sDate').value = today;
+    document.getElementById('sDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('sOpp').value = '';
     document.getElementById('sTime').value = '';
     document.getElementById('sPlace').value = '';
@@ -570,28 +544,27 @@
     setTimeout(() => document.getElementById('sOpp').focus(), 100);
   }
   function closeScheduleModal() { document.getElementById('scheduleModal').classList.remove('open'); }
-  function saveSchedule() {
+  window.closeScheduleModal = closeScheduleModal;
+  async function saveSchedule() {
     const opp = document.getElementById('sOpp').value.trim();
     const date = document.getElementById('sDate').value;
     const time = document.getElementById('sTime').value;
     const place = document.getElementById('sPlace').value.trim();
     if (!opp) { alert('상대 팀 이름을 입력해주세요.'); return; }
     if (!date) { alert('날짜를 입력해주세요.'); return; }
-    schedules.push({ id: Date.now(), opp, date, time, place });
-    saveSchedules(); renderSchedules(); closeScheduleModal();
+    await push(ref(db, 'schedules'), { id: Date.now(), opp, date, time, place });
+    closeScheduleModal();
   }
-  function delSchedule(id) {
+  window.saveSchedule = saveSchedule;
+  async function delSchedule(key) {
     if (!confirm('이 일정을 삭제할까요?')) return;
-    schedules = schedules.filter(s => s.id !== id);
-    saveSchedules(); renderSchedules();
+    await remove(ref(db, 'schedules/' + key));
   }
 
-  let pendingScheduleId = null;
-
-  function openResultModal(scheduleId) {
-    const s = schedules.find(s => s.id === scheduleId);
+  function openResultModal(key) {
+    const s = schedules.find(s => s._key === key);
     if (!s) return;
-    pendingScheduleId = scheduleId;
+    pendingScheduleId = key;
     document.getElementById('resultModalSub').textContent = `vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
     document.getElementById('rGF').value = '';
     document.getElementById('rGA').value = '';
@@ -599,61 +572,41 @@
     document.getElementById('resultModal').classList.add('open');
     setTimeout(() => document.getElementById('rGF').focus(), 100);
   }
-  function closeResultModal() {
-    document.getElementById('resultModal').classList.remove('open');
-    pendingScheduleId = null;
-  }
-  function saveResultFromSchedule() {
+  function closeResultModal() { document.getElementById('resultModal').classList.remove('open'); pendingScheduleId = null; }
+  window.closeResultModal = closeResultModal;
+  async function saveResultFromSchedule() {
     const gf = parseInt(document.getElementById('rGF').value);
     const ga = parseInt(document.getElementById('rGA').value);
     const note = document.getElementById('rNote').value.trim();
     if (isNaN(gf) || isNaN(ga)) { alert('스코어를 입력해주세요.'); return; }
-    const s = schedules.find(s => s.id === pendingScheduleId);
+    const s = schedules.find(s => s._key === pendingScheduleId);
     if (!s) return;
-    matches.unshift({ id: Date.now(), opp: s.opp, date: s.date, gf, ga, note, r: result(gf, ga) });
-    schedules = schedules.filter(s => s.id !== pendingScheduleId);
-    save(); saveSchedules();
+    await push(ref(db, 'matches'), { id: Date.now(), opp: s.opp, date: s.date, gf, ga, note, r: result(gf, ga) });
+    await remove(ref(db, 'schedules/' + pendingScheduleId));
     closeResultModal();
     setFilter('all', document.querySelector('.tab'));
-    render(); renderSchedules();
-    document.getElementById('matchList').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('matchList').scrollIntoView({ behavior: 'smooth' }), 300);
   }
+  window.saveResultFromSchedule = saveResultFromSchedule;
 
-  // KAKAO SHARE
+  window.addMatch = addMatch;
+
   function shareKakao() {
     const total = matches.length;
     const wins = matches.filter(m => m.r === 'win').length;
     const loses = matches.filter(m => m.r === 'lose').length;
     const draws = matches.filter(m => m.r === 'draw').length;
     const winRate = total > 0 ? Math.round(wins/total*100) : 0;
-    const desc = total > 0
-      ? `${total}경기 ${wins}승 ${draws}무 ${loses}패 · 승률 ${winRate}%`
-      : '경기 기록을 확인해보세요!';
+    const desc = total > 0 ? `${total}경기 ${wins}승 ${draws}무 ${loses}패 · 승률 ${winRate}%` : '경기 기록을 확인해보세요!';
     const url = window.location.href;
-
-    if (window.Kakao && window.Kakao.isInitialized && window.Kakao.isInitialized()) {
-      window.Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title: `⚽ ${teamName} 경기 기록`,
-          description: desc,
-          imageUrl: 'https://via.placeholder.com/400x200/00C27C/000000?text=FUTSAL',
-          link: { mobileWebUrl: url, webUrl: url }
-        },
-        buttons: [{ title: '기록 보러가기', link: { mobileWebUrl: url, webUrl: url } }]
-      });
+    if (navigator.share) {
+      navigator.share({ title: `${teamName} 경기 기록`, text: desc, url });
     } else {
       const text = `⚽ ${teamName} 경기 기록\n${desc}\n\n${url}`;
-      if (navigator.share) {
-        navigator.share({ title: `${teamName} 경기 기록`, text: desc, url });
-      } else {
-        navigator.clipboard.writeText(text).then(() => alert('링크가 복사됐어요! 카톡에 붙여넣기 하세요 😊'));
-      }
+      navigator.clipboard.writeText(text).then(() => alert('링크가 복사됐어요! 카톡에 붙여넣기 하세요 😊'));
     }
   }
-
-  renderSchedules();
-  render();
+  window.shareKakao = shareKakao;
 </script>
 </body>
 </html>
