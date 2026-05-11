@@ -328,6 +328,7 @@
   <button class="nav-tab active" data-page="home">홈</button>
   <button class="nav-tab" data-page="matches">경기 기록</button>
   <button class="nav-tab" data-page="players">선수단</button>
+  <button class="nav-tab" data-page="rules">회칙</button>
 </div>
 
 <!-- HOME PAGE -->
@@ -460,6 +461,24 @@
   </div>
 </div>
 
+<!-- RULES PAGE -->
+<div class="page" id="page-rules">
+  <div style="padding:1.5rem;">
+    <div class="section-header">
+      <span class="section-title">📋 팀 회칙</span>
+      <button class="btn-add-schedule" id="btnEditRules">✏️ 수정</button>
+    </div>
+    <div id="rulesView"><div class="loading">불러오는 중...</div></div>
+    <div id="rulesEditor" style="display:none;">
+      <textarea id="rulesTextarea" placeholder="회칙 내용을 입력해주세요.&#10;&#10;예)&#10;1. 회비는 매월 1일까지 납부한다.&#10;2. 경기 30분 전까지 집합한다.&#10;3. ..." style="width:100%;min-height:400px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;padding:14px;font-family:'Noto Sans KR',sans-serif;line-height:1.8;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn-cancel" style="flex:1;padding:10px;border:1px solid var(--border);background:none;color:var(--muted);border-radius:8px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" id="btnRulesCancel">취소</button>
+        <button class="btn-save" style="flex:2;margin-top:0;" id="btnRulesSave">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, set, remove, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -517,8 +536,34 @@
 
   onValue(ref(db, 'teamPhoto'), s => { renderTeamPhoto(s.val()); });
   onValue(ref(db, 'teamLogo'), s => { renderTeamLogo(s.val()); });
+  onValue(ref(db, 'rules'), s => { renderRules(s.val()); });
 
-  // ── Team photo & logo ──
+  // ── Rules ──
+  function renderRules(content) {
+    const view = document.getElementById('rulesView');
+    if (!view) return;
+    if (!content) {
+      view.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px;line-height:1.8;">아직 회칙이 없어요.<br>수정 버튼을 눌러 작성해주세요.</div>`;
+    } else {
+      view.innerHTML = `<div style="font-size:14px;line-height:2;color:var(--text);white-space:pre-wrap;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    }
+  }
+
+  document.getElementById('btnEditRules').addEventListener('click', () => requestAdmin('editrules'));
+  document.getElementById('btnRulesCancel').addEventListener('click', () => {
+    document.getElementById('rulesEditor').style.display = 'none';
+    document.getElementById('rulesView').style.display = 'block';
+    document.getElementById('btnEditRules').style.display = '';
+  });
+  document.getElementById('btnRulesSave').addEventListener('click', async () => {
+    const content = document.getElementById('rulesTextarea').value.trim();
+    await set(ref(db, 'rules'), content || null);
+    document.getElementById('rulesEditor').style.display = 'none';
+    document.getElementById('rulesView').style.display = 'block';
+    document.getElementById('btnEditRules').style.display = '';
+  });
+
+
   function renderTeamPhoto(url) {
     const wrap = document.getElementById('teamPhotoWrap');
     if (url) {
@@ -1095,6 +1140,13 @@
       document.getElementById('nameInput').value=teamName;
       document.getElementById('nameModal').classList.add('open');
       setTimeout(()=>document.getElementById('nameInput').focus(),100);
+    } else if (action==='editrules') {
+      const current = document.getElementById('rulesView').querySelector('div[style*="pre-wrap"]');
+      document.getElementById('rulesTextarea').value = current ? current.textContent : '';
+      document.getElementById('rulesView').style.display = 'none';
+      document.getElementById('rulesEditor').style.display = 'block';
+      document.getElementById('btnEditRules').style.display = 'none';
+      setTimeout(() => document.getElementById('rulesTextarea').focus(), 50);
     } else if (action==='photo') {
       document.getElementById('teamPhotoInput').click();
     } else if (action==='logo') {
