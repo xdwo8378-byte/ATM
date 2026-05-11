@@ -906,28 +906,62 @@
   });
   document.getElementById('playerNameInput').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btnSavePlayer').click(); });
 
+  function getAttendanceTally() {
+    // 참여 인원이 기록된 경기만 집계
+    const trackedMatches = matches.filter(m => m.participants && m.participants.length > 0);
+    const total = trackedMatches.length;
+    const tally = {};
+    trackedMatches.forEach(m => {
+      m.participants.forEach(k => { tally[k] = (tally[k]||0) + 1; });
+    });
+    return { tally, total };
+  }
+
   function renderPlayerList() {
     const tally = getGoalTally();
     const momTally = getMomTally();
-    const sorted = players.map(p => ({...p, goals:tally[p._key]||0, momCount:momTally[p._key]||0})).sort((a,b) => b.goals-a.goals);
+    const { tally: attTally, total: attTotal } = getAttendanceTally();
+    const sorted = players.map(p => ({
+      ...p,
+      goals: tally[p._key]||0,
+      momCount: momTally[p._key]||0,
+      attended: attTally[p._key]||0,
+      attTotal
+    })).sort((a,b) => b.goals-a.goals);
     const el = document.getElementById('playerList');
     if (!sorted.length) { el.innerHTML='<div class="empty">등록된 팀원이 없어요.<br>팀원 추가 버튼을 눌러주세요!</div>'; return; }
-    el.innerHTML = sorted.map((p,i) => `
-      <div class="player-card">
-        <div class="player-rank ${i===0&&p.goals>0?'gold':i===1&&p.goals>0?'silver':i===2&&p.goals>0?'bronze':''}">${i+1}</div>
-        <div class="player-avatar">${p.name.charAt(0)}</div>
-        <div class="player-info">
-          <div class="player-name">${p.name}</div>
-          <div class="player-stats">
-            ⚽ ${p.goals}골${p.momCount > 0 ? ` &nbsp;🌟 MOM ${p.momCount}회` : ''}
+    el.innerHTML = sorted.map((p,i) => {
+      const attRate = p.attTotal > 0 ? Math.round(p.attended / p.attTotal * 100) : null;
+      const barColor = attRate >= 80 ? 'var(--green)' : attRate >= 50 ? 'var(--yellow)' : 'var(--red)';
+      return `
+      <div class="player-card" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="player-rank ${i===0&&p.goals>0?'gold':i===1&&p.goals>0?'silver':i===2&&p.goals>0?'bronze':''}">${i+1}</div>
+          <div class="player-avatar">${p.name.charAt(0)}</div>
+          <div class="player-info">
+            <div class="player-name">${p.name}</div>
+            <div class="player-stats">
+              ⚽ ${p.goals}골${p.momCount > 0 ? ` &nbsp;🌟 MOM ${p.momCount}회` : ''}
+            </div>
           </div>
+          <div style="text-align:center;min-width:40px">
+            <div class="player-goals">${p.goals}</div>
+            <div class="player-goals-lbl">골</div>
+          </div>
+          <button class="del-player-btn" data-pkey="${p._key}">✕</button>
         </div>
-        <div style="text-align:center;min-width:40px">
-          <div class="player-goals">${p.goals}</div>
-          <div class="player-goals-lbl">골</div>
-        </div>
-        <button class="del-player-btn" data-pkey="${p._key}">✕</button>
-      </div>`).join('');
+        ${attRate !== null ? `
+        <div style="padding:0 4px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;">
+            <span>📊 출전율</span>
+            <span style="color:${barColor};font-weight:700;">${attRate}% <span style="color:var(--muted);font-weight:400;">(${p.attended}/${p.attTotal}경기)</span></span>
+          </div>
+          <div style="background:var(--surface2);border-radius:99px;height:5px;overflow:hidden;">
+            <div style="height:100%;width:${attRate}%;background:${barColor};border-radius:99px;transition:width 0.4s;"></div>
+          </div>
+        </div>` : ''}
+      </div>`;
+    }).join('');
     el.querySelectorAll('.del-player-btn').forEach(btn => {
       btn.addEventListener('click', () => requestAdmin('delplayer:'+btn.dataset.pkey));
     });
