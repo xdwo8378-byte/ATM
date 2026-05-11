@@ -161,9 +161,9 @@
   .add-player-form input { flex: 1; }
   .btn-add-player { padding: 9px 16px; background: var(--green); color: #000; font-weight: 700; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; white-space: nowrap; }
 
-  .mvp-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
-  .mvp-chip.selected { background: rgba(255,184,0,0.15); border-color: var(--yellow); color: var(--yellow); }
-  .mvp-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--yellow); margin-top: 3px; } padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .mom-chip { font-size: 13px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s; }
+  .mom-chip.selected { background: rgba(255,184,0,0.15); border-color: var(--yellow); color: var(--yellow); }
+  .mom-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--yellow); margin-top: 3px; }
   .participant-chip.selected { background: rgba(0,194,124,0.15); border-color: var(--green); color: var(--green); }
   .participant-chip .check { font-size: 11px; }
   @media (max-width: 400px) {
@@ -253,8 +253,8 @@
       <div class="scorer-list" id="resultScorerList"></div>
     </div>
     <div class="scorer-section">
-      <div class="scorer-title">🌟 MVP 선택 (선택사항)</div>
-      <div class="scorer-list" id="resultMvpList"></div>
+      <div class="scorer-title">🌟 MOM 선택 (선택사항)</div>
+      <div class="scorer-list" id="resultMomList"></div>
     </div>
     <div class="form-group" style="margin-bottom:0">
       <span class="form-label">메모 (선택)</span>
@@ -362,13 +362,6 @@
       <span><span class="bar-dot" style="background:var(--red)"></span>패</span>
     </div>
   </div>
-  <!-- MVP RANKING -->
-  <div style="padding:0 1.5rem 1.5rem;">
-    <div class="section-header">
-      <span class="section-title">🌟 MVP 순위</span>
-    </div>
-    <div id="mvpRankingPreview"><div class="no-schedule">MVP 기록이 없어요.</div></div>
-  </div>
 </div>
 
 <!-- MATCHES PAGE -->
@@ -415,8 +408,8 @@
         <div class="scorer-list" id="addScorerList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
       </div>
       <div class="scorer-section">
-        <div class="scorer-title">🌟 MVP 선택 (선택사항)</div>
-        <div class="scorer-list" id="addMvpList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
+        <div class="scorer-title">🌟 MOM 선택 (선택사항)</div>
+        <div class="scorer-list" id="addMomList"><div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div></div>
       </div>
       <div class="form-group" style="margin-bottom:10px">
         <span class="form-label">메모 (선택)</span>
@@ -480,8 +473,8 @@
   let addScorerSel = {}, resultScorerSel = {}, editScorerSel = {};
   // participant selections: Set of playerKeys
   let addParticipantSel = new Set(), resultParticipantSel = new Set();
-  // MVP: playerKey or null
-  let addMvpSel = null, resultMvpSel = null;
+  // MOM: playerKey or null
+  let addMomSel = null, resultMomSel = null;
 
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 
@@ -493,7 +486,7 @@
   onValue(ref(db, 'matches'), s => {
     const d = s.val();
     matches = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})).sort((a,b) => b.id-a.id) : [];
-    renderStats(); renderMatchList(); renderTopScorers(); renderMvpRanking(); renderPlayerList();
+    renderStats(); renderMatchList(); renderTopScorers(); renderMomRanking(); renderPlayerList();
   });
   onValue(ref(db, 'schedules'), s => {
     const d = s.val();
@@ -503,7 +496,7 @@
   onValue(ref(db, 'players'), s => {
     const d = s.val();
     players = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})) : [];
-    renderPlayerList(); renderAddScorerChips(); renderTopScorers(); renderMvpRanking();
+    renderPlayerList(); renderAddScorerChips(); renderTopScorers(); renderMomRanking();
   });
 
   onValue(ref(db, 'teamPhoto'), s => { renderTeamPhoto(s.val()); });
@@ -622,11 +615,11 @@
     return tally;
   }
 
-  function getMvpTally() {
+  function getMomTally() {
     const tally = {};
     matches.forEach(m => {
-      if (!m.mvp) return;
-      tally[m.mvp] = (tally[m.mvp]||0) + 1;
+      if (!m.mom) return;
+      tally[m.mom] = (tally[m.mom]||0) + 1;
     });
     return tally;
   }
@@ -645,17 +638,17 @@
       </div>`).join('');
   }
 
-  function renderMvpRanking() {
-    const tally = getMvpTally();
-    const sorted = players.map(p => ({...p, mvpCount: tally[p._key]||0})).filter(p => p.mvpCount > 0).sort((a,b) => b.mvpCount-a.mvpCount).slice(0,5);
-    const el = document.getElementById('mvpRankingPreview');
-    if (!sorted.length) { el.innerHTML = '<div class="no-schedule">MVP 기록이 없어요.</div>'; return; }
+  function renderMomRanking() {
+    const tally = getMomTally();
+    const sorted = players.map(p => ({...p, momCount: tally[p._key]||0})).filter(p => p.momCount > 0).sort((a,b) => b.momCount-a.momCount).slice(0,5);
+    const el = document.getElementById('momRankingPreview');
+    if (!sorted.length) { el.innerHTML = '<div class="no-schedule">MOM 기록이 없어요.</div>'; return; }
     el.innerHTML = sorted.map((p,i) => `
       <div class="player-card" style="margin-bottom:6px;">
         <div class="player-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
         <div class="player-avatar" style="border-color:rgba(255,184,0,0.4)">${p.name.charAt(0)}</div>
-        <div class="player-info"><div class="player-name">${p.name}</div><div class="player-stats" style="color:var(--yellow)">🌟 ${p.mvpCount}회 선정</div></div>
-        <div style="text-align:center"><div class="player-goals" style="color:var(--yellow)">${p.mvpCount}</div><div class="player-goals-lbl">회</div></div>
+        <div class="player-info"><div class="player-name">${p.name}</div><div class="player-stats" style="color:var(--yellow)">🌟 ${p.momCount}회 선정</div></div>
+        <div style="text-align:center"><div class="player-goals" style="color:var(--yellow)">${p.momCount}</div><div class="player-goals-lbl">회</div></div>
       </div>`).join('');
   }
 
@@ -678,14 +671,14 @@
       }
       const participantCount = m.participants ? m.participants.length : null;
       const participantHtml = participantCount ? `<div class="match-scorers" style="color:var(--muted)">👥 ${participantCount}명 참여</div>` : '';
-      const mvpPlayer = m.mvp ? players.find(p=>p._key===m.mvp) : null;
-      const mvpHtml = mvpPlayer ? `<div class="mvp-badge">🌟 MVP ${mvpPlayer.name}</div>` : '';
+      const momPlayer = m.mom ? players.find(p=>p._key===m.mom) : null;
+      const momHtml = momPlayer ? `<div class="mom-badge">🌟 MOM ${momPlayer.name}</div>` : '';
       return `<div class="match-card ${m.r}" data-key="${m._key}">
         <span class="result-badge ${rc[m.r]}">${rl[m.r]}</span>
         <div class="match-info">
           <div class="match-opp">vs ${m.opp}</div>
           <div class="match-meta">${d}${m.note?' · '+m.note:''} &nbsp;(${diffStr})</div>
-          ${scorerNames}${participantHtml}${mvpHtml}
+          ${scorerNames}${participantHtml}${momHtml}
         </div>
         <div class="match-score">${m.gf}:${m.ga}</div>
         <button class="del-btn" data-delkey="${m._key}" title="삭제">✕</button>
@@ -755,22 +748,22 @@
 
   function renderAddParticipantChips() { buildParticipantChips('addParticipantList', addParticipantSel, 'addParticipantCount'); }
 
-  function buildMvpChips(containerId, currentMvp, onSelect) {
+  function buildMomChips(containerId, currentMom, onSelect) {
     const el = document.getElementById(containerId);
     if (!players.length) { el.innerHTML='<div class="no-players">선수단 탭에서 팀원을 먼저 등록해주세요.</div>'; return; }
     el.innerHTML = players.map(p => `
-      <button class="mvp-chip ${currentMvp===p._key?'selected':''}" data-pkey="${p._key}">
-        ${currentMvp===p._key?'🌟 ':''}${p.name}
+      <button class="mom-chip ${currentMom===p._key?'selected':''}" data-pkey="${p._key}">
+        ${currentMom===p._key?'🌟 ':''}${p.name}
       </button>`).join('');
-    el.querySelectorAll('.mvp-chip').forEach(chip => {
+    el.querySelectorAll('.mom-chip').forEach(chip => {
       chip.addEventListener('click', () => {
-        onSelect(chip.dataset.pkey === currentMvp ? null : chip.dataset.pkey);
+        onSelect(chip.dataset.pkey === currentMom ? null : chip.dataset.pkey);
       });
     });
   }
 
-  function renderAddMvpChips() { buildMvpChips('addMvpList', addMvpSel, v => { addMvpSel=v; renderAddMvpChips(); }); }
-  function renderResultMvpChips() { buildMvpChips('resultMvpList', resultMvpSel, v => { resultMvpSel=v; renderResultMvpChips(); }); }
+  function renderAddMomChips() { buildMomChips('addMomList', addMomSel, v => { addMomSel=v; renderAddMomChips(); }); }
+  function renderResultMomChips() { buildMomChips('resultMomList', resultMomSel, v => { resultMomSel=v; renderResultMomChips(); }); }
 
   document.getElementById('btnSelectAll').addEventListener('click', () => {
     if (addParticipantSel.size === players.length) addParticipantSel.clear();
@@ -796,13 +789,13 @@
     const scorers = {};
     Object.entries(addScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
     const participants = Array.from(addParticipantSel);
-    await push(ref(db,'matches'), { id:Date.now(), opp, date, gf, ga, note, r:result(gf,ga), scorers, participants, mvp: addMvpSel||null });
+    await push(ref(db,'matches'), { id:Date.now(), opp, date, gf, ga, note, r:result(gf,ga), scorers, participants, mom: addMomSel||null });
     document.getElementById('fOpp').value='';
     document.getElementById('fGF').value='';
     document.getElementById('fGA').value='';
     document.getElementById('fNote').value='';
-    addScorerSel = {}; addParticipantSel = new Set(); addMvpSel = null;
-    renderAddScorerChips(); renderAddParticipantChips(); renderAddMvpChips();
+    addScorerSel = {}; addParticipantSel = new Set(); addMomSel = null;
+    renderAddScorerChips(); renderAddParticipantChips(); renderAddMomChips();
     document.getElementById('addForm').classList.remove('open');
   });
 
@@ -813,11 +806,11 @@
     editingMatchKey = key;
     document.getElementById('scorersModalTitle').textContent = `vs ${m.opp} ${m.gf}:${m.ga}`;
     let html = `<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">${m.date?m.date.replace(/-/g,'.'):''}${m.note?' · '+m.note:''}</div>`;
-    if (m.mvp) {
-      const mvpP = players.find(p=>p._key===m.mvp);
-      if (mvpP) html += `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;">
+    if (m.mom) {
+      const momP = players.find(p=>p._key===m.mom);
+      if (momP) html += `<div style="display:flex;align-items:center;gap:10px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;">
         <span style="font-size:1.4rem;">🌟</span>
-        <div><div style="font-size:11px;color:var(--yellow);letter-spacing:0.5px;text-transform:uppercase;">MVP</div><div style="font-size:15px;font-weight:700;">${mvpP.name}</div></div>
+        <div><div style="font-size:11px;color:var(--yellow);letter-spacing:0.5px;text-transform:uppercase;">MOM</div><div style="font-size:15px;font-weight:700;">${momP.name}</div></div>
       </div>`;
     }
     if (m.participants && m.participants.length) {
@@ -880,8 +873,8 @@
 
   function renderPlayerList() {
     const tally = getGoalTally();
-    const mvpTally = getMvpTally();
-    const sorted = players.map(p => ({...p, goals:tally[p._key]||0, mvpCount:mvpTally[p._key]||0})).sort((a,b) => b.goals-a.goals);
+    const momTally = getMomTally();
+    const sorted = players.map(p => ({...p, goals:tally[p._key]||0, momCount:momTally[p._key]||0})).sort((a,b) => b.goals-a.goals);
     const el = document.getElementById('playerList');
     if (!sorted.length) { el.innerHTML='<div class="empty">등록된 팀원이 없어요.<br>팀원 추가 버튼을 눌러주세요!</div>'; return; }
     el.innerHTML = sorted.map((p,i) => `
@@ -891,7 +884,7 @@
         <div class="player-info">
           <div class="player-name">${p.name}</div>
           <div class="player-stats">
-            ⚽ ${p.goals}골${p.mvpCount > 0 ? ` &nbsp;🌟 MVP ${p.mvpCount}회` : ''}
+            ⚽ ${p.goals}골${p.momCount > 0 ? ` &nbsp;🌟 MOM ${p.momCount}회` : ''}
           </div>
         </div>
         <div style="text-align:center;min-width:40px">
@@ -968,10 +961,10 @@
     const scorers={};
     Object.entries(resultScorerSel).forEach(([k,v]) => { if(v>0) scorers[k]=v; });
     const participants = Array.from(resultParticipantSel);
-    await push(ref(db,'matches'), {id:Date.now(),opp:s.opp,date:s.date,gf,ga,note,r:result(gf,ga),scorers,participants,mvp:resultMvpSel||null});
+    await push(ref(db,'matches'), {id:Date.now(),opp:s.opp,date:s.date,gf,ga,note,r:result(gf,ga),scorers,participants,mom:resultMomSel||null});
     await remove(ref(db,'schedules/'+pendingScheduleId));
     document.getElementById('resultModal').classList.remove('open');
-    pendingScheduleId=null; resultScorerSel={}; resultParticipantSel=new Set(); resultMvpSel=null;
+    pendingScheduleId=null; resultScorerSel={}; resultParticipantSel=new Set(); resultMomSel=null;
     document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector('[data-page="matches"]').classList.add('active');
@@ -1006,7 +999,7 @@
     if (action==='toggle') {
       const f=document.getElementById('addForm');
       f.classList.toggle('open');
-      if (f.classList.contains('open')) { renderAddScorerChips(); renderAddParticipantChips(); renderAddMvpChips(); setTimeout(()=>document.getElementById('fOpp').focus(),50); }
+      if (f.classList.contains('open')) { renderAddScorerChips(); renderAddParticipantChips(); renderAddMomChips(); setTimeout(()=>document.getElementById('fOpp').focus(),50); }
     } else if (action.startsWith('delete:')) {
       delMatch(action.split(':')[1]);
     } else if (action==='schedule') {
@@ -1020,13 +1013,13 @@
     } else if (action.startsWith('enterresult:')) {
       const key=action.split(':')[1];
       const s=schedules.find(s=>s._key===key); if(!s) return;
-      pendingScheduleId=key; resultScorerSel={}; resultParticipantSel=new Set(); resultMvpSel=null;
+      pendingScheduleId=key; resultScorerSel={}; resultParticipantSel=new Set(); resultMomSel=null;
       document.getElementById('resultModalSub').textContent=`vs ${s.opp} (${s.date.replace(/-/g,'.')}) 결과를 입력해주세요.`;
       document.getElementById('rGF').value=''; document.getElementById('rGA').value='';
       document.getElementById('rNote').value=s.place||'';
       buildScorerChips('resultScorerList', resultScorerSel);
       buildParticipantChips('resultParticipantList', resultParticipantSel, 'resultParticipantCount');
-      renderResultMvpChips();
+      renderResultMomChips();
       document.getElementById('resultModal').classList.add('open');
       setTimeout(()=>document.getElementById('rGF').focus(),100);
     } else if (action==='teamname') {
