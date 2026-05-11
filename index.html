@@ -639,9 +639,10 @@
   }
 
   function renderMomRanking() {
+    const el = document.getElementById('momRankingPreview');
+    if (!el) return;
     const tally = getMomTally();
     const sorted = players.map(p => ({...p, momCount: tally[p._key]||0})).filter(p => p.momCount > 0).sort((a,b) => b.momCount-a.momCount).slice(0,5);
-    const el = document.getElementById('momRankingPreview');
     if (!sorted.length) { el.innerHTML = '<div class="no-schedule">MOM 기록이 없어요.</div>'; return; }
     el.innerHTML = sorted.map((p,i) => `
       <div class="player-card" style="margin-bottom:6px;">
