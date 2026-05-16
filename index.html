@@ -277,6 +277,27 @@
       <button class="btn-confirm" style="flex:2;background:var(--surface2);color:var(--text);border:1px solid var(--border)" id="btnEditScorers">득점자 수정</button>
       <button class="btn-confirm" style="flex:2;background:rgba(255,184,0,0.15);color:var(--yellow);border:1px solid rgba(255,184,0,0.3)" id="btnEditMom">MOM 수정</button>
     </div>
+    <div style="margin-top:8px;">
+      <button class="btn-confirm" style="width:100%;background:rgba(0,194,124,0.1);color:var(--green);border:1px solid rgba(0,194,124,0.3)" id="btnEditParticipants">👥 참여 인원 수정</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PARTICIPANTS MODAL -->
+<div class="modal-overlay" id="editParticipantsModal">
+  <div class="modal">
+    <div class="modal-title">👥 참여 인원 수정</div>
+    <div class="scorer-section">
+      <div class="scorer-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>참여한 팀원을 선택해주세요 <span id="editParticipantCount" style="color:var(--green)"></span></span>
+        <button type="button" id="btnEditSelectAll" style="font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">전체 선택</button>
+      </div>
+      <div class="scorer-list" id="editParticipantList"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnEditParticipantsCancel">취소</button>
+      <button class="btn-confirm" id="btnEditParticipantsConfirm">저장</button>
+    </div>
   </div>
 </div>
 
@@ -917,7 +938,35 @@
     document.getElementById('editScorersModal').classList.remove('open');
   });
 
-  // ── Edit MOM ──
+  document.getElementById('btnEditParticipants').addEventListener('click', () => requestAdmin('editparticipants'));
+
+  // ── Edit participants ──
+  let editParticipantSel = new Set();
+  function refreshEditParticipantChips() {
+    buildParticipantChips('editParticipantList', editParticipantSel, 'editParticipantCount');
+    const btn = document.getElementById('btnEditSelectAll');
+    if (btn) btn.textContent = editParticipantSel.size === players.length ? '전체 해제' : '전체 선택';
+  }
+  function openEditParticipants() {
+    const m = matches.find(m => m._key===editingMatchKey);
+    if (!m) return;
+    editParticipantSel = new Set(m.participants || []);
+    document.getElementById('scorersModal').classList.remove('open');
+    refreshEditParticipantChips();
+    document.getElementById('editParticipantsModal').classList.add('open');
+  }
+  document.getElementById('btnEditSelectAll').addEventListener('click', () => {
+    if (editParticipantSel.size === players.length) editParticipantSel.clear();
+    else players.forEach(p => editParticipantSel.add(p._key));
+    refreshEditParticipantChips();
+  });
+  document.getElementById('btnEditParticipantsCancel').addEventListener('click', () => document.getElementById('editParticipantsModal').classList.remove('open'));
+  document.getElementById('btnEditParticipantsConfirm').addEventListener('click', async () => {
+    await update(ref(db,'matches/'+editingMatchKey), { participants: Array.from(editParticipantSel) });
+    document.getElementById('editParticipantsModal').classList.remove('open');
+  });
+
+
   let editMomSel = null;
   function refreshEditMomChips() { buildMomChips('editMomList', editMomSel, v => { editMomSel=v; refreshEditMomChips(); }); }
   function openEditMom() {
@@ -1163,6 +1212,8 @@
       openEditScorers();
     } else if (action==='editmom') {
       openEditMom();
+    } else if (action==='editparticipants') {
+      openEditParticipants();
     }
   }
 
