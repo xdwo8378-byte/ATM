@@ -166,6 +166,22 @@
   .mom-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--yellow); margin-top: 3px; }
   .participant-chip.selected { background: rgba(0,194,124,0.15); border-color: var(--green); color: var(--green); }
   .participant-chip .check { font-size: 11px; }
+  /* OPPONENT RECORDS */
+  .opp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+  .opp-card:hover { border-color: #444; }
+  .opp-card-header { display: flex; align-items: center; gap: 10px; }
+  .opp-name { font-size: 15px; font-weight: 500; flex: 1; }
+  .opp-record { font-size: 13px; color: var(--muted); }
+  .opp-winrate { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; min-width: 52px; text-align: right; }
+  .opp-bar { margin-top: 8px; background: var(--surface2); border-radius: 99px; height: 5px; overflow: hidden; display: flex; }
+  .opp-bar-win { background: var(--green); height: 100%; transition: width 0.4s; }
+  .opp-bar-draw { background: var(--yellow); height: 100%; transition: width 0.4s; }
+  .opp-bar-lose { background: var(--red); height: 100%; transition: width 0.4s; }
+  .opp-matches { padding-top: 10px; display: none; border-top: 1px solid var(--border); margin-top: 10px; }
+  .opp-matches.open { display: block; }
+  .opp-match-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .opp-match-row:last-child { border-bottom: none; }
+
   @media (max-width: 400px) {
     .stats-section { gap: 6px; }
     .stat-num { font-size: 2rem; }
@@ -459,6 +475,14 @@
     <button class="ftab" data-filter="lose">패</button>
   </div>
   <div class="match-list" id="matchList"><div class="loading">불러오는 중...</div></div>
+
+  <!-- 상대 전적 -->
+  <div style="padding:1.5rem;">
+    <div class="section-header">
+      <span class="section-title">🆚 상대 전적</span>
+    </div>
+    <div id="opponentRecords"><div class="no-schedule">경기 기록이 없어요.</div></div>
+  </div>
 </div>
 
 <!-- PLAYERS PAGE -->
@@ -538,7 +562,7 @@
   onValue(ref(db, 'matches'), s => {
     const d = s.val();
     matches = d ? Object.entries(d).map(([k,v]) => ({...v, _key:k})).sort((a,b) => b.id-a.id) : [];
-    renderStats(); renderMatchList(); renderTopScorers(); renderMomRanking(); renderPlayerList();
+    renderStats(); renderMatchList(); renderOpponentRecords(); renderTopScorers(); renderMomRanking(); renderPlayerList();
   });
   onValue(ref(db, 'schedules'), s => {
     const d = s.val();
@@ -681,6 +705,68 @@
     for (let i=1;i<matches.length;i++) { if(matches[i].r===last) cnt++; else break; }
     const labels={win:'연승',lose:'연패',draw:'연무'}, cls={win:'streak-win',lose:'streak-lose',draw:'streak-draw'};
     tag.textContent=cnt+' '+labels[last]; tag.className='streak-tag '+cls[last];
+  }
+
+  // ── Opponent records ──
+  function renderOpponentRecords() {
+    const el = document.getElementById('opponentRecords');
+    if (!el) return;
+    if (!matches.length) { el.innerHTML = '<div class="no-schedule">경기 기록이 없어요.</div>'; return; }
+
+    // 상대팀별 집계
+    const oppMap = {};
+    matches.forEach(m => {
+      if (!oppMap[m.opp]) oppMap[m.opp] = { wins:0, draws:0, loses:0, games:[] };
+      oppMap[m.opp].games.push(m);
+      if (m.r==='win') oppMap[m.opp].wins++;
+      else if (m.r==='draw') oppMap[m.opp].draws++;
+      else oppMap[m.opp].loses++;
+    });
+
+    const sorted = Object.entries(oppMap).sort((a,b) => {
+      const ta = a[1].wins+a[1].draws+a[1].loses;
+      const tb = b[1].wins+b[1].draws+b[1].loses;
+      return tb - ta;
+    });
+
+    const rl = {win:'W', lose:'L', draw:'D'};
+    const rc = {win:'rb-win', lose:'rb-lose', draw:'rb-draw'};
+
+    el.innerHTML = sorted.map(([opp, data]) => {
+      const total = data.wins + data.draws + data.loses;
+      const winRate = Math.round(data.wins / total * 100);
+      const wrColor = winRate >= 60 ? 'var(--green)' : winRate >= 40 ? 'var(--text)' : 'var(--red)';
+      const gamesHtml = data.games.map(m => `
+        <div class="opp-match-row">
+          <span class="result-badge ${rc[m.r]}" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;width:24px;text-align:center;">${rl[m.r]}</span>
+          <span style="color:var(--text);font-weight:500;">${m.gf}:${m.ga}</span>
+          <span style="color:var(--muted);flex:1;">${m.date?m.date.replace(/-/g,'.'):''}${m.note?' · '+m.note:''}</span>
+        </div>`).join('');
+
+      return `<div class="opp-card" data-opp="${opp}">
+        <div class="opp-card-header">
+          <div>
+            <div class="opp-name">vs ${opp}</div>
+            <div class="opp-record">${total}전 ${data.wins}승 ${data.draws}무 ${data.loses}패</div>
+          </div>
+          <div class="opp-winrate" style="color:${wrColor}">${winRate}%</div>
+        </div>
+        <div class="opp-bar">
+          <div class="opp-bar-win" style="width:${Math.round(data.wins/total*100)}%"></div>
+          <div class="opp-bar-draw" style="width:${Math.round(data.draws/total*100)}%"></div>
+          <div class="opp-bar-lose" style="width:${Math.round(data.loses/total*100)}%"></div>
+        </div>
+        <div class="opp-matches" id="opp-${opp.replace(/\s/g,'_')}">${gamesHtml}</div>
+      </div>`;
+    }).join('');
+
+    // 클릭해서 펼치기
+    el.querySelectorAll('.opp-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const detail = card.querySelector('.opp-matches');
+        detail.classList.toggle('open');
+      });
+    });
   }
 
   // ── Goal tally ──
